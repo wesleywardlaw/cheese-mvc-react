@@ -1,0 +1,77 @@
+## Declarative Cycling
+
+The declarative cycling approach can be applied to any type of development. In frontend design it has the following cycle. Remember that this is just a general cycle to keep you on track. You do not need to follow it strictly if doing so impinges on your development flow:
+
+- **Level** entry point
+  - begin at the highest (macro) point of the current level
+  - your application, the Route Component(s)
+  - a Parent component
+  - a Child component
+- **Declare** (without implementing) the pieces needed to fulfill that level
+  - in this step you are simply "shelling" out the pieces you need
+    - none (or some) of it exists
+    - you are providing some basic framing to be filled out during implementation
+  - this is a first pass, you don't need to get it perfect just be fluid and declare what you think you will need at the moment
+    - you can (and will) return to flesh out or make changes during the **Implementation** or **Loop** step of the cycle
+  - Route Component
+    - its path
+    - its behavior
+    - the name of the Component it will render
+      - create a file with this name
+      - write its `import` statement
+  - Component (whichever apply)
+    - consider its responsibilities
+      - does it need to be a stateful component or can it be a functional component?
+    - use functions
+      - if they do not exist
+        - call them as you would want them to behave
+        - consider what arguments they would need
+        - consider what they return / what behavior you expect them to perform
+        - if the function is only used in this component
+          - if it uses the component's state or methods define it as a method
+          - if it does not then define it externally as a standalone utility function
+        - if the function is shared
+          - create the file and import it
+    - its props
+      - their names (defined in the Parent that renders the component)
+      - how they will be used
+    - its state
+      - declarative names
+      - initial values
+    - its methods
+      - its lifecycle or declarative name
+      - its parameters
+    - its rendering behavior
+      - conditional rendering logic
+      - HTML and/or Style Components
+      - Child Components (whichever apply)
+        - its declarative name
+          - create the file with this name and import it
+            - the component is specific to this Parent
+              - create it in a sub-directory specific to the Parent
+            - the component is generic and may be reused across multiple Parents
+              - create it in a shared directory
+        - its event props
+        - its HTML attribute props
+        - its data props from the Parent
+        - its handler methods from the Parent
+- **Implement** the pieces needed to fulfill the level (whichever apply)
+  - implement the pieces you are certain of
+    - prop types
+    - default props
+    - method bodies
+    - conditional rendering logic
+  - skip pieces you are unsure of at the time and return at a later **Loop** step
+- **Loop**
+  - to the first step on the next level
+    - if this level appears complete at the moment
+      - implement tests
+      - go one level down
+    - if this level and all of its sublevels are complete
+      - move horizontally to another piece at this level
+      - if requirements are met and all tests pass you are done
+  - to a step on the previous level
+    - if new ideas have come to light that require changes
+    - if you have a better understanding of how something you skipped should now be implemented
+  - many choices of next level
+    - choose the level that is most depended on by other pieces
