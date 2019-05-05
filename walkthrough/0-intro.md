@@ -34,6 +34,7 @@ Walkthrough for a Cheese MVC React SPA + REST API build and deployment.
   - topics
     - conditional expressions in JSX
     - dynamic (multi-use) components
+    - multi-input forms and validation
   - components
     - `<CheesesView>`
     - `<CheeseForm>`

@@ -6,9 +6,21 @@
   - Create React App
   - installing dependencies
   - React Router configuration
+  - stateless functional components
 - components
+  - `<App>`
+  - `<Router>`
   - `<CheeseNav>`
   - `<Footer>`
+
+## Shortcut
+Depending on how much time is available to complete this project you can take a shortcut through the config process by cloning this repo and using the starter code in the `code/` directory. 
+
+```sh
+git clone https://github.com/the-vampiire/cheese-mvc-react
+```
+
+This will provide starter code up to the Navigation and Footer section. Explore the starter code files. If the code is clear to you then you can skip to [Navigation and Footer](#Navigation-and-Footer). Otherwise read through starting at the following section.
 
 ## Create React App
 
@@ -33,19 +45,19 @@ In the `src/` directory
 - since `<App>` is a stateless functional component it does not need to be a class
 - rewrite `<App>` as an arrow function
 
-```js
-import React, { Component } from "react";
+`src/App.js`
 
-const App = () => (
-  <div>
-    {/* we will fill this part in soon! */}
-  </div>
-);
+```js
+import React from "react";
+
+const App = () => <div>{/* we will fill this part in soon! */}</div>;
 
 export default App;
 ```
 
 `index.js`: remove the service worker lines and unused imports so it appears like this:
+
+`src/index.js`
 
 ```js
 import React from "react";
@@ -60,21 +72,23 @@ In the `public/` directory
 - Delete the following files: `favicon.ico` and `manifest.json`
 - Edit the `index.html` file so it appears like this:
 
+`public/index.html`
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <title>Cheese React SPA</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-  </body>
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, shrink-to-fit=no"
+		/>
+		<title>Cheese React SPA</title>
+	</head>
+	<body>
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<div id="root"></div>
+	</body>
 </html>
 ```
 
@@ -86,9 +100,11 @@ Now that our React boilerplate has been cleaned up we can use NPM to install the
 - `react-bootstrap`, `react-router-bootstrap`, and `boostrap` to apply declarative, component-based, CSS styling
 - `axios` to manage asynchronous network requests to our Cheese Web API
 
-You can install these packages by entering the following into your terminal
+You can install these packages by entering the following into your terminal:
 
-- `npm i react-router-dom react-bootstrap react-router-bootstrap bootstrap axios`
+```sh
+npm i react-router-dom react-bootstrap react-router-bootstrap bootstrap axios
+```
 
 Confirm that the packages were installed by looking at the `package.json` file. It should contain the following under the `dependencies` field.
 
@@ -115,15 +131,20 @@ React Router will let us manage paths in the URL bar which will in turn instruct
 
 For a great introduction to React Router and its usage you can visit Tyler McGinnis's [article](https://tylermcginnis.com/react-router-philosophy-introduction/) or [video](https://youtu.be/3B588JwyT18) on the subject. It is in your best interest to read and/or watch his introduction before proceeding!
 
-We will begin by creating a `Routes` component file which will hold all of the paths and the view components that each will render. This file will serve as a registry of all the views our SPA provides. For now we will just set up the essentials of the Router and as we build each view component we will return to add them to our registry.
+We will begin by creating a `Routes` component file which will hold all of the paths and the view components that each will render. This file will serve as a registry of all the views our SPA provides. For now we will just set up the essentials of the Router and implement it later in the guide.
 
 First create a `Routes.js` file in the `src/` directory. You want this file to be at the same level as `App.js`. Inside of `Routes.js` enter the following code:
 
-- The commented `<Route>` tag will serve as a placeholder for when we begin adding our views.
-- Each view will have its own `<Route>` similar to how we set up route handlers in Spring Cheese MVC.
-- Notice we import from `react-router-dom` **not** `react-router`. React Router can be used for other applications beyond the web, `react-router-dom` exposes the functionality we need for routing in a web SPA.
+directory structure
 
-`Routes.js`
+```sh
+src/
+  index.js
+  App.js
+* Routes.js
+```
+
+`src/Routes.js`
 
 ```js
 import React from "react";
@@ -139,24 +160,28 @@ const Routes = () => (
 export default Routes;
 ```
 
+- The commented `<Route>` tag will serve as a placeholder for when we begin adding our views.
+- Each view will have its own `<Route>` similar to how we set up route handlers in Spring Cheese MVC.
+- Notice we import from `react-router-dom` **not** `react-router`. React Router can be used for other applications beyond the web, `react-router-dom` exposes the functionality we need for routing in a web SPA.
+
 Next we will set up the `<Router>` component in `App.js`. This component is the **controller** of all of our routes. It functions very similarly to a controller class you developed in the Spring CheeseMVC project. When a path (assigned to a `<Route>`) is matched in the `<Router>` it will render whatever component is assigned to that `<Route>`.
 
 In `App.js` we will import `<BrowserRouter>` from `react-router-dom` and then introduce it at the highest level of our application, the `<App>` component. We will use an import alias to rename this component to `<Router>`. Originally React Router used this name but when it expanded to manage routing in non-web applications it renamed it to `<BrowserRouter>` to avoid naming conflicts.
 
 It is important that the `<Router>` component is at the top level as it will render everything inside it, known as its **children**. This lets the `<Router>` control exactly what rendered on screen when a view route path is entered. For now the only children it will contain is our imported `<Routes>` component from our registry.
 
-`App.js`
+`src/App.js`
 
 ```js
-import React, { Component } from "react";
+import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import Routes from "./Routes";
 
 const App = () => (
-  <Router>
-    <Routes />
-  </Router>
+	<Router>
+		<Routes />
+	</Router>
 );
 
 export default App;
@@ -171,15 +196,29 @@ Before we begin writing our views we want to create a consistent navbar and foot
   - `CheeseNav.js`
   - `Footer.js`
 
+directory structure
+
+```sh
+src/
+  index.js
+  App.js
+  Routes.js
+* components/
+*   CheeseNav.js
+*   Footer.js
+```
+
 ### The `<CheeseNav>` Component
 
-We will be using the `react-bootstrap` library [`<NavBar>`](https://react-bootstrap.github.io/components/navbar/#navbars) and [`<Nav>`](https://react-bootstrap.github.io/components/navs/) components to provide some automatic Bootstrap styling. Traditionally we had to write Bootstrap class names in our HTML tags to apply styling. With `react-bootstrap` we use declarative components which provide CSS styling to its child components. All you have to do is import the pre-styled component and add whatever content you'd like inside (as its children)!
+We will be using the [`<NavBar>`](https://react-bootstrap.github.io/components/navbar/#navbars) and [`<Nav>`](https://react-bootstrap.github.io/components/navs/) components to provide some automatic Bootstrap styling to our navigation bar. Traditionally we had to write Bootstrap class names in our HTML tags to apply styling. With `react-bootstrap` we use declarative components which provide CSS styling to its child components. All you have to do is import the pre-styled component and add whatever content you'd like inside (as its children)!
 
-The `<Nav>` component will hold `react-router-bootstrap` `<LinkContainer>` components. These are styled React Router `<NavLink>` components that provide the same functionality but with bootstrap styling.
+You can read more about `react-bootstrap` and its styled components [here](https://react-bootstrap.github.io/getting-started/introduction/). In this guide all of the styled components will be provided since they need to be tweaked to look nice and we want to use our time learning React not styling! That being said React Bootstrap has an awesome [reference guide](https://react-bootstrap.github.io/components/alerts) if you want to understand how it works and use it in your own future projects.
 
-Recall that `<NavLink>`, like the `<Link`> component, tells React Router which view component to render for the given path. Using these utility components we can enable our SPA behavior (only an initial page load) instead of using traditional `href` anchor tags (which would cause the page to load on each click). `<NavLink>` give us the extra functionality of highlighing which link is active (matches the path). This provides a better UX as the user can understand where they currently are and which other links are available for navigation.
+The `<Nav>` component will use a related library called `react-router-bootstrap`. From this library we will use `<LinkContainer>` components as children within the `<Nav`. These are styled React Router `<NavLink>` components that provide the same functionality but with bootstrap styling.
 
-You can read more about `react-bootstrap` and its styled components [here](https://react-bootstrap.github.io/getting-started/introduction/).
+Recall that `<NavLink>`, like the React Router `<Link`> component, tells React Router which view component to render for the given path. Using these utility components we can enable our SPA behavior (only an initial page load) instead of using traditional `href` anchor tags (which would cause the page to load on each click).
+
+`<Nav.Link>` give us the extra functionality of highlighing which link is active (matches the path). This provides a better UX as the user can understand where they currently are and which other links are available for navigation.
 
 Our CheeseNav component will be a stateless functional component. It does not need to concern itself with any sense of state since its purpose is just to render the navigation links.
 
@@ -202,14 +241,14 @@ import NavBar from "react-bootstrap/NavBar";
 import { LinkContainer } from "react-router-bootstrap";
 
 const CheeseNav = () => (
-  <NavBar>
-    <Nav>
-      <LinkContainer to="/some/path/to/navigate">
-        <Nav.Link>User Facing Link Text</Nav.Link>
-      </LinkContainer>
-      {/* TODO: implement the links */}
-    </Nav>
-  </NavBar>
+	<NavBar>
+		<Nav>
+			<LinkContainer to="/some/path/to/navigate">
+				<Nav.Link>User Facing Link Text</Nav.Link>
+			</LinkContainer>
+			{/* TODO: implement the links */}
+		</Nav>
+	</NavBar>
 );
 
 export default CheeseNav;
@@ -227,16 +266,16 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 const Footer = () => (
-  <footer className="fixed-bottom">
-    <Row className="text-center">
-      <Col xs={12}>
-        Coded by
-        <a href="https://github.com/YOUR_USERNAME" target="_blank">
-          YOUR_NAME
-        </a>
-      </Col>
-    </Row>
-  </footer>
+	<footer className="fixed-bottom">
+		<Row className="text-center">
+			<Col xs={12}>
+				Coded by
+				<a href="https://github.com/YOUR_USERNAME" target="_blank">
+					{/* TODO: sign your name and put your GitHub username above */}
+				</a>
+			</Col>
+		</Row>
+	</footer>
 );
 
 export default Footer;
@@ -249,7 +288,7 @@ Back in `App.js` we want to make use of our components. We want to position our 
 `src/App.js`
 
 ```js
-import React, { Component } from "react";
+import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import Routes from "./Routes";
@@ -257,17 +296,17 @@ import CheeseNav from "./components/CheeseNav";
 import Footer from "./components/Footer";
 
 const App = () => (
-  <Router>
-    <CheeseNav />
-    <Routes />
-    <Footer />
-  </Router>
+	<Router>
+		<CheeseNav />
+		<Routes />
+		<Footer />
+	</Router>
 );
 
 export default App;
 ```
 
-While our structure appears sound - a navbar and footer wrapping a view renderer (<`Routes`>) we have introduced a syntactical error. React Router's `<Router>` component, like all React components, may only directly render a single child. To resolve this error we have two options.
+While our structure appears sound - a navbar and footer wrapping a view renderer (<`Routes`>) we have introduced a syntactical error. React Router's `<Router>` component, like all React components, may only directly render a single child. That child element can have multiple elements within it. To resolve this error we have two options.
 
 The first is to wrap our child components in a `<div>` and call it a day. But this is poor design as it leads to an unecessary `<div>` element that serves no semantic purpose. This is a bandaid solution that good developers know to avoid.
 
@@ -278,7 +317,7 @@ Let's fix this by importing `Fragment` from React. Alternatively you can use a s
 `src/App.js`
 
 ```js
-import React, { Component, Fragment } from "react";
+import React, { Fragment } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import Routes from "./Routes";
@@ -286,13 +325,13 @@ import CheeseNav from "./components/CheeseNav";
 import Footer from "./components/Footer";
 
 const App = () => (
-  <Router>
-    <Fragment>
-      <CheeseNav />
-      <Routes />
-      <Footer />
-    </Fragment>
-  </Router>
+	<Router>
+		<Fragment>
+			<CheeseNav />
+			<Routes />
+			<Footer />
+		</Fragment>
+	</Router>
 );
 
 export default App;
