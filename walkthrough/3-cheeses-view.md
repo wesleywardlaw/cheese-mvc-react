@@ -3,8 +3,10 @@
 - [previous: `2-categories-view.md`](./2-categories-view.md)
 - [next: `4-menus-view.md`](./4-menus-view.md)
 - topics
-  - conditional expressions in React
-  - dynamic components
+  - conditional expressions in JSX
+  - dynamic (multi-use) components
+  - setting state using current state
+  - multi-input forms and validation
 - components
   - `<CheesesView>`
   - `<CheeseForm>`
@@ -36,7 +38,7 @@ With these requirements in mind lets begin with the **Declaration** step of the 
   - `categories`: an array of category objects
     - initial value: `[]` empty array
   - `selectedCategoryID`: the ID of the currently selected category
-    - initial value: `''`: empty string
+    - initial value: `""`: empty string
       - indicates that no category has been selected, show all cheeses
 - methods
   - lifecycle
@@ -306,7 +308,7 @@ Note that this is a "dependency-first" approach to declarative cycling. You may 
 
 ## The `<CheeseCategorySelector>` Component
 
-The Cheese Category Selector component is actually pretty simple because its purpose is just rendering and reporting. What we mean by this is that it will render a select menu and report the chosen result to the Parent component that rendered it. 
+The Cheese Category Selector component is actually pretty simple because its purpose is just rendering and reporting. What we mean by this is that it will render a select menu and report the chosen result to the Parent component that rendered it.
 
 What's "complex" is that this component will be our first dynamic component. It needs to be used by two Parent components that have very different behaviors - one of which we haven't even created yet! Let's explore the two uses cases.
 
@@ -314,7 +316,7 @@ The `<CheesesView>` component uses it to trigger a request for cheeses whenever 
 
 Although it hasn't been implemented yet, we can expect the`<CheeseForm>` component to use it for updating the form `categoryID` state field of the cheese that is being created. It should pass `"Select a Category"` as its `firstOption` prop to enforce the user selecting a category before submitting the form.
 
-What both of these Parent components have in common is that they hold the `categoryID` in their own state and update that state field by handling the `onChange` event when the select menu is used. Because they each have different ways of handling this event we chose to name the props more generically as `handleChange` and `categoryID`. 
+What both of these Parent components have in common is that they hold the `categoryID` in their own state and update that state field by handling the `onChange` event when the select menu is used. Because they each have different ways of handling this event we chose to name the props more generically as `handleChange` and `categoryID`.
 
 Because of this generic naming the way the props are used make sense both to the Parent component passing them and the `<CheeseCategorySelector>` that uses them. If it was confusing you, this also explains why the prop names themselves are generic but the names of the state fields and methods that each Parent assigns to them are specific to their use case.
 
@@ -330,8 +332,11 @@ Since this component is only responsible for rendering and reporting (through it
 
 - props
   - `firstOption`: (optional) the user facing text for the first option in the menu
-  - `categories`: an array of category objects
-  - 2-way binding with the Parent component - `handleChange`: the handler prop method provided by the Parent - `categoryID`: from the Parent which controls option is considered "selected"
+  - `categories`: an array of category objects to create select options
+  - 2-way binding with the Parent component
+    - since our component is used by multiple
+    - `handleChange`: the handler prop method provided by the Parent
+    - `categoryID`: from the Parent which controls option is considered "selected"
 - utility functions
   - `createCategoryOption`: transforms a category into a JSX select option
 - rendering
@@ -385,4 +390,349 @@ CheeseCategorySelector.defaultProps = {
 };
 
 export default CheeseCategorySelector;
+```
+
+Now that our dynamic component is complete let's create the other Parent component that uses it, the `<CheeseForm>`.
+
+## The `<CheeseForm>` Component
+
+The Cheese Form component is responsible for:
+
+- rendering a form for creating a new cheese
+- controlling the submission of the form by validating user inputs
+- submitting the form data in an API request
+- upating the `<CheesesView>` Parent component with new cheese data
+
+This component, like every form component in React, requires a sense of state to manage form data. Let's explore the **Declaration** step of the cycle:
+
+- state
+  - `disabled`: controls whether the submit button can be used
+    - initial value `true` so the form can't be submitted when empty
+  - `fields`: an object that holds each of the form input values
+    - since our form has multiple inputs we bundle them into an object to make form submission easier
+    - all fields will have an initial empty string `""` value
+    - `name`: cheese name
+    - `description`: cheese description
+    - `categoryID`: cheese category ID
+- props
+  - `categories` list for the `<CheeseCategorySelector>`
+  - `addCheese` handler for providing the `<CheesesView>` with the new cheese
+- utility functions
+  - `shouldDisable`: receives the form data and returns the new value for `disabled`
+    - used every time an input value is changed to ensure all values are valid before enabling submission
+- rendering
+  -
+
+### Multi-Input Forms & Validation
+
+Before we dive into implementing this component let's explore how to manage a form with multiple inputs. The first form component we implemented in `<CategoryForm>` was a simple one with a single `name` text input. Managing this form was easy since updating state when the input changed only relied on detecting and validating that single input.
+
+The Cheese Form, however, has to manage 3 different inputs. Two text inputs for `name` and `description` along with using our dynamic `<CheeseCategorySelector>` for the `categoryID` field. As you continue developing React applications you will find that most of the forms you develop will have to manage multiple inputs as well. Yes, managing several inputs is more complex. But thankfully there is a systematic process that can scale from managing 2 to a million fields the exact same way.
+
+You likely noticed how instead of holding the form fields directly in state we store them as nested properties in an object called `fields`. This helps us organize the inputs in a single location so that updating, validating, and submitting them is easier. Because all of the fields in this object can be identified by their name (the name given to their corresponding input element) we can design some dynamic handlers for each of these form management tasks.
+
+First let's tackle the dynamic input change event handler. This is the core method that both validation and submission rely on. Recall that event handlers receive `event` objects that have a `target` object property. This `event.target` object holds data about the input element that was changed. In particular it holds the two properties of information we're after - the `name` and `value` of the input.
+
+We know that our goal is to update state for the input's new `value`. We know that the changed input can be identified in the `fields` state object by its `name`. So what we want to do is set state by merging the current `fields` from state with the new input value to keep them all up to date.
+
+### Setting State Using Current State
+
+Recall that component state can not be mutated directly, instead we use `this.setState()` method. If you are setting state without using the current state you can simply pass an object with the new state or specific fields you want to update. React will only change the fields provided in the object, leaving any other state fields as they were.
+
+```js
+// not using current state to set new state
+this.setState({ field: value });
+
+// example from below, updating state does not use current state
+resetForm = () => this.setState(initialState);
+```
+
+However, if you are using data from the current state when setting a new state you must use a callback inside `setState()` instead of an object. The callback receives current state as an argument and you should return a new state object from it.
+
+```js
+this.setState(currentState => {
+	// derive new state using currentState
+	// return an object with the updated state
+});
+```
+
+The reason for this is that component state is set asychronously due to React's efficient rendering approach. It will batch state updates and execute them at the most efficient moment, which may not be when you expect them to be executed. Because this process occurs asynchronously we can not rely on the current value of state from `this.state` as it may be "out of sync" by the time `setState()` is processed.
+
+```js
+// DON'T DO THIS!
+updateUsingState = () => {
+	// using the current value from state outside of this.setState()
+
+	// using "fieldName" with some other data to derive new state
+	const fieldName = this.state.fieldName + otherData;
+
+	// this.state may be different by the time setState is processed
+	this.setState({ fieldName });
+};
+
+// DO THIS INSTEAD
+updateUsingState = () => {
+	this.setState(currentState => {
+		// currentState will be the correct (current) state relative to this update
+		const fieldName = currentState + otherData;
+		return { fieldName };
+	});
+};
+```
+
+Why is this important? Because our goal for handling input changes is to merge the current `fields` data in state with a new input value. To accomplish this we need to use the callback approach to `setState()`.
+
+### Multi-Input Form Change Handling
+
+So what should our `handleInputChange` method look like? Let's begin with what we know:
+
+```js
+handleInputChange = event => {
+	// we need the name and value from the input, the event target
+	const { name, value } = event.target;
+
+	// we need to set state by using current state so we use the setState callback
+	this.setState(currentState => {
+		// we current state fields to merge with the new value
+		const { fields } = currentState;
+
+		// we need to copy current fields into a new object so as not to directly mutate it
+		// we can use the spread operator as a shorthand since all the field properties are primitives
+		const updatedFields = { ...fields };
+
+		// ? update the value in fields for the current input's name
+
+		// return the updated state of fields
+		return { fields: updatedFields };
+	});
+};
+```
+
+Now comes the dynamic part of our handler. We want to perform the same behavior regardless of which input we receive in the change event target. This way we can write one handler that all of our inputs can assign to the `onChange` event prop.
+
+Recall that you can access and set object properties with a variable using the bracket notation:
+
+```js
+const object = { property: "original value" };
+const propertyName = "property";
+
+object[propertyName]; // 'original value'
+object[propertyName] = "new value";
+object[propertyName]; // 'new value'
+```
+
+Our `name` from the input target is a variable - it will vary depending on which input was changed. We can use the bracket notation to update the value dynamically!
+
+```js
+handleInputChange = event => {
+	// we need the name and value from the input, the event target
+	const { name, value } = event.target;
+
+	// we need to set state by using current state so we use the setState callback
+	this.setState(currentState => {
+		// we current state fields to merge with the new value
+		const { fields } = currentState;
+
+		// we need to copy current fields into a new object so as not to directly mutate it
+		// we can use the spread operator as a shorthand since all the field properties are primitives
+		const updatedFields = { ...fields };
+
+		// set the new value dynamically using the name variable
+		updatedFields[name] = value;
+
+		// return the updated state of fields
+		return { fields: updatedFields };
+	});
+};
+```
+
+Now our `handleInputChange` can handle input changes from 1 to a million inputs the same way! As a bonus take a look at the shorthand way of writing this handler, feel free to use whichever approach makes sense to you.
+
+```js
+handleInputChange = event => {
+	const { name, value } = event.target;
+
+	this.setState(currentState => {
+    const fields = { ...currentState.fields, [name]: value };
+    // same as
+    // const fields = { ...currentState.fields };
+    // fields[name] = value;
+		return { fields };
+	});
+};
+
+// or if you really want to push it by sacrificing readability
+handleInputChange = ({ target: { name, value } }) =>
+	this.setState(state => ({ fields: { ...state.fields, [name]: value } }));
+```
+
+### Multi-Input Form Validation
+Now that we have completed the dynamic input change handler it's time to think about validation of the field values. Form validation can be done in a variety of different ways from custom implementations to using third party libraries. Before getting lost in the process remember to keep your end goal in mind. 
+
+We have a field in state called `disabled` that controls whether the submit button can be clicked. We have fields with values that we want to validate. Our end goal is to check the fields, according to the input requirements, and return a 
+
+
+Your tasks
+
+- copy the starter code to its file
+- complete the TODOs in the snippet
+
+`src/components/cheese/CheeseForm`
+
+```js
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+
+import request from '../../utilities/api-request';
+import { categoryPropType } from '../../utilities/prop-types';
+import CheeseCategorySelector from "./CheeseCategorySelector";
+
+const shouldDisable(formFields) {
+  let disabled = false;
+  for (const [name, value] of Object.entries(formFields)) {
+    switch (name) {
+      case 'name':
+        if (value.length < 3 || value.length > 15) {
+          disabled = true;
+        }
+        break;
+      case 'description':
+      case 'categoryID':
+      default:
+        if (value === "") {
+          disabled = true;
+        }
+    }
+  }
+
+  return disabled;
+}
+
+// we write the initial state object externally
+// this way we can use it both to set initial state and when resetting the form
+// single source of truth, DRY principles!
+const initialState = {
+  // TODO: implement initial state
+}
+
+class CheeseForm extends Component {
+  state = initialState;
+
+  // resets the form by setting state back to the initial state
+  resetForm = () => this.setState(initialState);
+
+  handleInputChange = event => {
+    // TODO: implement a dynamic input change event handler
+  }
+
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const { fields } = this.state;
+    const { addCheese } = this.props;
+
+    // TODO: submit the form with a request to the API
+    const res = // use the correct Axios method, endpoint, and data
+    const cheese = res.data;
+
+    // TODO: give the new cheese data to the Cheeses View Parent
+    // TODO: reset the form
+  }
+
+  render() {
+    const { categories } = this.props;
+    const { disabled, fields: { name, description, categoryID } } = this.state;
+
+    return (
+      <Form>
+        <Form.Row>
+          <Form.Group as={Col}>
+            <Form.Label>Name</Form.Label>
+            <Form.Control
+              name='name'
+              value={name}
+              minLength={3}
+              maxLength={15}
+              onChange={this.handleInputChange}
+            />
+          </Form.Group>
+          <Form.Group as={Col}>
+            <Form.Label>Cheese Category</Form.Label>
+            <CheeseCategorySelector
+              categories={categories}
+              handleChange={this.handleInputChange}
+            />
+          </Form.Group>
+        </Form.Row>
+
+        <Form.Row>
+          <Form.Group as={Col}>
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              required
+              name='description'
+              value={description}
+              onChange={this.handleInputChange}
+            />
+          </Form.Group>
+        </Form.Row>
+
+        <Form.Row>
+          <Col xs={{ span: 4, offset: 2 }} lg={{ span: 2, offset: 4 }}>
+            <Button
+              type='submit'
+              variant='primary'
+              disabled={disabled}
+              onClick={this.handleSubmit}
+            >
+              Create
+            </Button>
+          </Col>
+          <Col xs={{ span: 3 }} lg={{ span: 2 }}>
+            <Button
+              type='button'
+              variant='outline-secondary'
+              onClick={() => this.resetForm()}
+            >
+              Cancel
+            </Button>
+          </Col>
+        </Form.Row>
+      </Form>
+    );
+  }
+}
+
+
+const CheeseFormModal = (props) => {
+  const { categories, showForm, hideForm, addToCheeses } = props;
+
+  return (
+    <Modal centered size='lg' show={showForm} onHide={hideForm}>
+      <Modal.Header closeButton />
+      <Modal.Title className='text-center'>Create a New Cheese</Modal.Title>
+      <Modal.Body>
+        <CheeseForm categories={categories} addToCheeses={addToCheeses} hideForm={hideForm} />
+      </Modal.Body>
+    </Modal>
+  );
+}
+
+const CheeseFormPropTypes = {
+  categories: PropTypes.arrayOf(categoryPropType).isRequired,
+  hideForm: PropTypes.func.isRequired,
+  addToCheeses: PropTypes.func.isRequired,
+};
+
+CheeseForm.propTypes = CheeseFormPropTypes;
+
+CheeseFormModal.propTypes = {
+  ...CheeseFormPropTypes,
+  showForm: PropTypes.bool.isRequired,
+}
+
+export default CheeseFormModal;
 ```
