@@ -72,22 +72,22 @@ Walkthrough for a Cheese MVC React SPA + REST API build and deployment.
 ```js
 // CheeseEntity
 {
-	id: Number;
-	name: String;
-	description: String;
-	category: CategoryEntity;
+  id: Number;
+  name: String;
+  description: String;
+  category: CategoryEntity;
 }
 
 // CategoryEntity
 {
-	id: Number;
-	name: String;
+  id: Number;
+  name: String;
 }
 
 // MenuEntity
 {
-	id: Number;
-	name: String;
+  id: Number;
+  name: String;
 }
 ```
 
@@ -147,15 +147,13 @@ SPAs can be made dynamic by providing an external data source. Incoming data can
 
 ## How SPAs Work
 
-In traditional static or SSR dynamic websites the HTML is served according to the requested path from the browser. Each time a new path is entered or navigated to (by clicking a link) a request is made to the host server to respond with the respective view.
+In traditional static or SSR dynamic websites the HTML is served according to the requested path from the browser. Each time a new path is entered or navigated to (by clicking a link) a request is made to the host server and the page reloads when the new view is received in response. When the address of the SPA site is requested the host server only needs to provide two documents - a base HTML file and a JavaScript bundle file. Navigation requests after this point do not require page reloads - hence the name Single Page Application!
 
-When the address of the SPA site is requested the host server only needs to provide two documents - a base HTML file and a JavaScript bundle file.
+The base HTML file is very simple and serves to provide a header (for meta information, style sheets, and optional third party JavaScript) and a body with a single `<div>` which serves as the **root div**. This root div is what the JavaScript bundle will attach to and, using JavaScript, render the views. You might be wondering "how can a single JavaScript file manage to build and update an entire navigable website?" The answer is in modern technologies called **front end frameworks**.
 
-The base HTML file is very simple and serves to provide a header (for meta information, style sheets, and optional third party JavaScript) and a body with a single `<div>` which serves as the **root div**. This root div is what the JavaScript bundle will attach to and, using JavaScript, render the views. You might be asking - how can a single JavaScript file manage to build and update an entire navigable website? The answer is in modern technologies called **front end frameworks**.
+A frontend framework operates similar to the backend frameworks we have explored - such as Flask and Spring. They provide a basis for building a SPA through the use of reusable **components**. Think of a component as a template fragment. It has a distinct purpose, is dynamic depending on the data injected into it, and can be reused both within and across projects. Each component represents some single or collective HTML tags that the browser uses to render the view. Rather than hard-coding this HTML we rely on JavaScript to convert our component instructions _on the fly_ (at runtime).
 
-A frontend framework operates similar to the backend frameworks we have explored - such as Flask and Spring. They provide a basis for building a SPA through the use of reusable **components**. Think of a component as a template fragment. It has a distinct purpose, is dynamic depending on the data injected into it, and can be reused. Each component represents some single or collective HTML tags that the browser uses to render the view. Rather than hard-coding this HTML we rely on JavaScript to convert our component instructions _on the fly_ (at runtime).
-
-The most popular frontend framework is React but two other notable frameworks are Angular and Vue. Frontend frameworks differ in how they convert JavaScript instructions into components and manage efficient update rendering into HTML. But all of them operate under the same base concept. You write JavaScript that instructs the framework on how you want the site to appear, you bundle these instructions into a single file, and the framework manages the creation and updating of that content once the bundle has loaded.
+The [most popular frontend framework](https://insights.stackoverflow.com/survey/2019#technology-_-web-frameworks) is React but two other notable frameworks are Angular and Vue. Frontend frameworks differ in how they convert JavaScript instructions into components and manage efficient update rendering into HTML. But all of them operate under the same base concept. You write JavaScript that instructs the framework on how you want the site to appear, you bundle these instructions into a single file, and the framework manages the creation and updating of that content once the bundle has loaded.
 
 Once the bundle has been received and processed by the browser no other server requests are needed for rendering in the browser. Future network requests are only used to manage external data using AJAX requests and Web APIs.
 
