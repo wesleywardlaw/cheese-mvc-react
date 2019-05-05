@@ -17,7 +17,7 @@
   - `<CategoryForm>`
   - `<CategoriesList>`
 
-# Views & Components
+# Views & Components: Part One
 
 Now that the base configuration is complete it's time to move onto the View components and their constituent components. There are plenty of approaches that can be used for building React applications. We will use my "declarative cycling" approach in this guide. You can read or review the approach in [`declarative-cycling.md`](./declarative-cycling.md) or plow along blissfully with the rest of this guide.
 
@@ -75,7 +75,7 @@ The `<Switch>` component is used to match paths. It behaves like a `switch() {}`
 
 # The Views
 
-We will now move to the next level - our (Parent) View components. We have four choices of View components to begin with. Let's consider the dependencies that each have on one another:
+We will now move to the next level - our (Parent) View components and their constituents. We have four choices of View components to begin with. Let's consider the dependencies that each have on one another:
 
 - Home View
   - no dependencies
@@ -93,6 +93,14 @@ With the dependencies determined the order we should approach this build is:
 - Categories View
 - Cheeses View
 - Menus View
+- Home View
+
+You may have also decided to approach it with partial completion:
+
+- Categories View
+- partial Menus View (everything except adding / viewing cheeses)
+- Cheeses View
+- complete Menus View
 - Home View
 
 ## The `<CategoriesView>` Component
@@ -164,7 +172,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 
-import request from "../utils/api-request";
+import request from "../utilities/api-request";
 import CategoriesList from "../components/Category/CategoriesList";
 import CategoryForm from "../components/Category/CategoryForm";
 
@@ -343,7 +351,7 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
-import request from "../../utils/api-request";
+import request from "../../utilities/api-request";
 
 class CategoryForm extends Component {
 	state = {
@@ -632,7 +640,7 @@ Next let's import the shape from this new file and use it in the prop types for 
 
 ```js
 // other imports
-import { categoryShape } from '../../utils/prop-types';
+import { categoryShape } from '../../utilities/prop-types';
 
 // component code
 
@@ -664,3 +672,6 @@ export const categoryShape = PropTypes.shapeOf({
 ```
 
 Since you are already in the file and foresee needing the other entity shapes you can implement and export them now. Think about how you will implement the `CheeseEntity` shape which uses the category shape as one of its property types.
+
+# Section Complete
+Next let's begin with the [Cheeses View](./3-cheeses-view.md)

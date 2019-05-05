@@ -288,4 +288,5 @@ const App = () => (
 export default App;
 ```
 
+# Section Complete
 Next let's begin with the [Views & Components](./2-categories-view.md)
