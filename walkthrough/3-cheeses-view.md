@@ -3,8 +3,8 @@
 - [previous: `2-categories-view.md`](./2-categories-view.md)
 - [next: `4-menus-view.md`](./4-menus-view.md)
 - topics
-  - conditional props
-  - complex component interactions
+  - conditional expressions in React
+  - dynamic components
 - components
   - `<CheesesView>`
   - `<CheeseForm>`
