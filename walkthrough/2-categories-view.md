@@ -1,16 +1,17 @@
-
 # The Categories View
+
 - [previous: `1-config.md`](./1-config.md)
 - [next: `3-cheeses-view.md`](./3-cheeses-view.md)
 - topics
-    - registering React Router routes
-    - view and child components
-    - the declarative cycle approach
-    - stateful components
-    - form validation
-    - the Axios library
-    - making AJAX requests
-    - prop types
+  - registering React Router routes
+  - view and child components
+  - the declarative cycle approach
+  - stateful components
+  - form validation
+  - the Axios library
+  - using environment variables
+  - making AJAX requests
+  - prop types
 - components
   - View `<Route>` components
   - `<CategoriesView>`
@@ -127,13 +128,13 @@ With these requirements in mind lets begin with the **Declaration** step of the 
     - `addToCategories`: receives a new category to add to its list
 - rendering
   - grid `<Container>`: to hold and position its children
-    - `<CategoryForm>` component
-      - handler props
-        - `addCategory` prop handler to use `addToCategories`
-          - will be called when the form is submitted and new category is received from the API
-    - `<CategoriesList>` component
-      - data props
-        - `categories` list
+  - `<CategoryForm>` component
+    - handler props
+      - `addCategory` prop handler to use `addToCategories`
+        - will be called when the form is submitted and new category is received from the API
+  - `<CategoriesList>` component
+    - data props
+      - `categories` list
 
 Your tasks
 
@@ -169,7 +170,6 @@ src/
 ```js
 import React, { Component } from "react";
 import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 
 import request from "../utilities/api-request";
@@ -212,14 +212,13 @@ class CategoriesView extends Component {
 export default CategoriesView;
 ```
 
-Now that we have declared the pieces we need and implemented the pieces we understand let's break down a strategy for the Implementation step at the next level of the cycle. We can do this by taking stock of the pieces that still need to be implemented:
+Now that we have declared the pieces we need and implemented the pieces we understand let's break down a strategy for the Implementation step at the next level of the cycle. We can do this by taking stock of the pieces that still need to be implemented and their dependency chain:
 
 - components
   - `<CategoryForm>`
     - depends on `request`
       - need to make a `POST` request to the API to submit a new category
   - `<CategoriesList>`
-    - depends on
     - indirectly depends on `request`
       - our `<CategoriesView>` needs to make a `GET` request to the API to get the list of categories used as a data prop to this component
     - depends on the `<CategoryForm>`
@@ -307,34 +306,33 @@ With these requirements in mind lets begin with the **Declaration** step of the 
     - initial value: `true` to prevent the form being submitted when it is empty
 - props
   - `addCategory`: handler method from the Parent
-    - for updating the Parent component with new data from the API when the form is submitted
+    - for updating the Parent component state with new data from the API when the form is submitted
 - methods
   - handlers
     - `handleInputChange`: handles an input change on the form
-      - used to establish 2-way binding between form inputs and the component state holding input values
+      - used to establish 2-way binding between form inputs and the component state holding the input values
     - `resetForm`: resets the form after it has been submitted
       - used to clear the input values
     - `handleSubmit`: handles submitting the form
-      - behaviors
-        - prevent default behavior that causes a page to reload when a form is submitted
-        - make an AJAX request to the API with the form data
-        - update the Parent component with the response data
+      - prevents default behavior that causes a page to reload when a form is submitted
+      - makes an AJAX request to the API with the form data
+      - updates the Parent component with the response data using `addCategory` prop handler method
 - rendering
   - `<Form>`: container for holding input elements
-    - input components
-      - a text input for the name field
-        - attribute props
-          - `name` the name of the input field
-          - `value` for 2-way binding with the form state
-          - `minLength` for providing validation cues
-          - `maxLength` for providing validation cues
-        - event props
-          - `onChange` for managing 2-way binding with the form state
-      - a submit button
-        - attribute props
-          - `disabled` for controlling whether the form is allowed to be submitted
-        - event props
-          - `onClick` for submitting the form
+  - input components
+    - a text input for the name field
+      - attribute props
+        - `name` the name of the input field
+        - `value` for 2-way binding with the form state
+        - `minLength` for providing validation cues
+        - `maxLength` for providing validation cues
+      - event props
+        - `onChange` for managing 2-way binding with the form state
+    - a submit button
+      - attribute props
+        - `disabled` for controlling whether the form is allowed to be submitted
+      - event props
+        - `onClick` for submitting the form
 
 Your tasks:
 
@@ -354,65 +352,65 @@ import Button from "react-bootstrap/Button";
 import request from "../../utilities/api-request";
 
 class CategoryForm extends Component {
-	state = {
+  state = {
     // TODO: implement initial state
-	};
+  };
 
-	handleInputChange = event => {
+  handleInputChange = event => {
     // the name and value attributes of the input that was changed
     const { name, value } = event.target;
     // true or false based on whether the value is invalid
     const disabled = // TODO: implement an expression that will set this value based on the validity of the value
 
-		// TODO: update state with the new values of "disabled" and "name"
+    // TODO: update state with the new values of "disabled" and "name"
   };
 
-  // sets the value to an empty string to reset it
+  // sets the value to an empty string to reset the form
   resetForm = () => this.setState({ name: '' });
 
-	handleSubmit = async event => {
-		event.preventDefault();
-		const { name } = this.state;
-		const { addToCategories } = this.props;
+  handleSubmit = async event => {
+    event.preventDefault();
+    const { name } = this.state;
+    const { addToCategories } = this.props;
 
-		const res = // TODO: send a POST request with the form data (don't forget to await the Promise!)
-		const category = res.data;
+    const res = // TODO: send a POST request with the form data (don't forget to await the Promise!)
+    const category = res.data;
 
-    // TODO: update the Parent component with the new category
+    // TODO: update state with the new category
     // TODO: reset the form
-	};
+  };
 
-	render() {
-		const { disabled, name } = this.state;
+  render() {
+    const { disabled, name } = this.state;
 
-		return (
-			<Form>
-				<Form.Row>
-					<Form.Group as={Col}>
-						<Form.Label>Category Name</Form.Label>
+    return (
+      <Form>
+        <Form.Row>
+          <Form.Group as={Col}>
+            <Form.Label>Category Name</Form.Label>
             <Form.Control
               name="name"
               {/* TODO: implement the remaining props */}
-						/>
+            />
           </Form.Group>
 
           <Col xs={{ span: 4, offset: 2 }} lg={{ span: 2 }}>
-						<Button
-							type="submit"
+            <Button
+              type="submit"
               variant="primary"
               {/* TODO: implement the remaining props */}
-						>
-							Create
-						</Button>
-					</Col>
-				</Form.Row>
-			</Form>
-		);
-	}
+            >
+              Create
+            </Button>
+          </Col>
+        </Form.Row>
+      </Form>
+    );
+  }
 }
 
 CategoryForm.propTypes = {
-	// TODO: implement the prop types for this component (see below)
+  // TODO: implement the prop types for this component (see below)
 };
 
 export default CategoryForm;
@@ -439,11 +437,11 @@ import PropTypes from "prop-types";
 class ComponentName extends Component {
 	static propTypes = {
 		propName: PropTypes.string, // or any other prop type
-  };
-  
-  static defaultProps = {
-    propName: 'default value', // whatever value you want as a default
-  };
+	};
+
+	static defaultProps = {
+		propName: "default value", // whatever value you want as a default
+	};
 }
 ```
 
@@ -456,7 +454,7 @@ import PropTypes from "prop-types";
 class ComponentName extends Component {}
 
 ComponentName.propTypes = {
-	propName: PropTypes.string, // or another prop type
+  propName: PropTypes.string, // or another prop type
 };
 
 ComponentName.defaultProps = {
@@ -481,12 +479,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 const propTypes = {
-  propName: PropTypes.func.isRequired, // any other type, .isRequired is optional
-}
+	propName: PropTypes.func.isRequired, // any other type, .isRequired is optional
+};
 
 class ComponentName extends Component {
-  // internal
-  static propTypes = propTypes;
+	// internal
+	static propTypes = propTypes;
 }
 
 // external: assign the propTypes object after the component has been defined
@@ -504,13 +502,13 @@ When defining prop types you want to consider four aspects for each prop:
   - if `.isRequired` is not appended the prop is considered optional
 - should the prop have a default value if it is not received from a Parent?
   - define the prop and its default value in the `defaultProps` object
-  - if a component does not have defaults then the `defaultProps` object does not need to be defined 
+  - if a component does not have defaults then the `defaultProps` object does not need to be defined
 
 Let's implement the prop types for the `<CategoryForm>` component as an example. We know that it receives one prop (a handler method). The type of this prop is a function (`PropTypes.func`). It is required since our component will break if we don't receive it (`.isRequired`). We do not want to provide a default value since it is required.
 
 ```js
 CategoryForm.propTypes = {
-  addCategory: PropTypes.func.isRequired,
+	addCategory: PropTypes.func.isRequired,
 };
 ```
 
@@ -518,8 +516,8 @@ As an example here is how you would provide a default value
 
 ```js
 CategoryForm.defaultProps = {
-  addCategory: () => {},
-}
+	addCategory: () => {},
+};
 ```
 
 Now that the component is complete let's move onto the `<CategoriesList>` component and finish the Categories View!
@@ -565,7 +563,7 @@ const createCategoryRow = category => (
 
 const CategoriesList = (props) => {
   const { categories } = props;
-  
+
   return (
     <Container>
       <Row>
@@ -595,7 +593,8 @@ export default CategoriesList;
 ```
 
 ### PropTypes: Shapes
-This component's prop types are more complex. You may have considered just putting `PropTypes.array.isRequired` but realized there is no `.array` type. Instead, playing the dot game, you came across `.arrayOf()`. This is because simply listing a prop type as an array is not sufficient for type checking. Arrays in JavaScript can have many different types in them, including other data structures like objects. The `arrayOf()` type is the tool we will use to describe what the array of is _of_ in terms of its "shape". If the array were made up of simple primitives we could just add something like `PropTypes.arrayOf(PropTypes.string)` which translates to an expected shape of `[String]`. 
+
+This component's prop types are more complex. You may have considered just putting `PropTypes.array.isRequired` but realized there is no `.array` type. Instead, playing the dot game, you came across `.arrayOf()`. This is because simply listing a prop type as an array is not sufficient for type checking. Arrays in JavaScript can have many different types in them, including other data structures like objects. The `arrayOf()` type is the tool we will use to describe what the array of is _of_ in terms of its "shape". If the array were made up of simple primitives we could just add something like `PropTypes.arrayOf(PropTypes.string)` which translates to an expected shape of `[String]`.
 
 In this component we expect an array of `CategoryEntity` shaped objects. At the top of this guide, in the API Reference section, the shape of the category entity was defined. Recall that the shape of an entity from a REST API describes the properties of each resource entity and what types each of them are.
 
@@ -642,13 +641,13 @@ Next let's import the shape from this new file and use it in the prop types for 
 
 ```js
 // other imports
-import { categoryShape } from '../../utilities/prop-types';
+import { categoryShape } from "../../utilities/prop-types";
 
 // component code
 
 CategoriesList.propTypes = {
-  categories: PropTypes.arrayOf(categoryShape).isRequired,
-}
+	categories: PropTypes.arrayOf(categoryShape).isRequired,
+};
 ```
 
 Now how do we define this shape using the Prop Types library? Using the `PropTypes.shape()` method and the defining each of the property name / type pairs inside.
@@ -676,4 +675,5 @@ export const categoryShape = PropTypes.shapeOf({
 Since you are already in the file and foresee needing the other entity shapes you can implement and export them now. Think about how you will implement the `CheeseEntity` shape which uses the category shape as one of its property types.
 
 # Section Complete
+
 Next let's begin with the [Cheeses View](./3-cheeses-view.md)

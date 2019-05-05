@@ -43,39 +43,43 @@ With these requirements in mind lets begin with the **Declaration** step of the 
     - `componentDidMount`: where we will make an API request
       - for the current state of the cheeses collection
       - for the current state of the categories collection
+      - update state with the `cheeses` and `categories`
   - handlers
     - `addToCheeses`: receives a new cheese to add to its cheeses list
     - `deleteCheese`: receives a cheese ID
       - sends a delete request
-      - removes the cheese from its cheeses list
+      - updates state by removing the cheese from its cheeses list
     - `getCategoryCheeses`: receives a category change event object
-      - gets the category ID from the value of the chosen category from the event object
-      - updates the cheeses list with cheeses for that category
+      - gets the category ID from the event object
+        - `event.target` can be used to access the value of the chosen option
       - if the category ID is an empty string, `""`, then it fetches all the cheeses
       - otherwise it fetches the cheeses with the chosen category ID
+      - sets state
+        - with the new value of `categoryID`
+        - the cheeses list with cheeses for that category
 - rendering
   - grid `<Container>`: to hold and position its children
-    - `<CheeseForm>`
-      - data props
-        - `categories` list
-      - handler props
-        - `addCheese` to use the `addToCategories` method
-          - will be called when the form is submitted and new cheese is received from the API
-    - `<CheeseCategorySelector>`
-      - data props
-        - `categories` list
-        - `firstOption` the user facing text, `"All Cheeses"` of the first option in the select menu
-        - `categoryID` value of the chosen category from component state
-      - handler props
-        - `handleChange` to use the `getCategoryCheeses` method
-    - `<CheesesList>`
-      - data props
-        - `cheeses` list
-      - handler props
-        - `removeCheese` to use the `deleteCheese` method
-          - should only be passed in if the `categoryID` is `""` meaning "all cheeses"
-            - there is only a `DELETE /cheeses/:cheeseID` endpoint
-            - cheeses can not be deleted within a category since the `category_id` column has a `NOT NULL` constraint
+  - `<CheeseForm>`
+    - data props
+      - `categories` list
+    - handler props
+      - `addCheese` to use the `addToCategories` method
+        - will be called when the form is submitted and new cheese is received from the API
+  - `<CheeseCategorySelector>`
+    - data props
+      - `categories` list
+      - `firstOption` the user facing text, `"All Cheeses"` of the first option in the select menu
+      - `categoryID` value of the chosen category from component state
+    - handler props
+      - `handleChange` to use the `getCategoryCheeses` method
+  - `<CheesesList>`
+    - data props
+      - `cheeses` list
+    - handler props
+      - `removeCheese` to use the `deleteCheese` method
+        - should only be passed in if the `categoryID` is `""` meaning "all cheeses"
+          - there is only a `DELETE /cheeses/:cheeseID` endpoint
+          - cheeses can not be deleted within a category since the `category_id` column has a `NOT NULL` constraint
 
 Your tasks
 
@@ -121,28 +125,28 @@ import CheeseForm from "../components/Cheese/CheeseForm";
 import CheeseCategorySelector from "../components/Cheese/CheeseCategorySelector";
 
 class CheesesView extends Component {
-	state = {
+  state = {
     // TODO: implement the initial state
-	};
+  };
 
-	async componentDidMount() {
+  async componentDidMount() {
     const cheeseRes = // TODO: implement a request to the cheeses collection
     const cheeses = cheeseRes.data;
 
     const categoriesRes = // TODO: implement a request to the categories collection
     const categories = categoriesRes.data;
 
-		this.setState({ cheeses, categories });
-	}
+    this.setState({ cheeses, categories });
+  }
 
-	addToCheeses = cheese =>
-		this.setState(state => {
-			const { cheeses } = state;
-			// TODO: return the new state that merges the cheeses list with the new cheese
-		});
+  addToCheeses = cheese =>
+    this.setState(state => {
+      const { cheeses } = state;
+      // TODO: return the new state that merges the cheeses list with the new cheese
+    });
 
-	removeFromCheeses = async cheeseID => {
-		const res = // TODO: implement a request to the correct endpoint to delete the cheese (be mindful of the HTTP method you need)
+  removeFromCheeses = async cheeseID => {
+    const res = // TODO: implement a request to the correct endpoint to delete the cheese (be mindful of the HTTP method you need)
 
     // if the DELETE request was unsuccessful exit early
     if (res.status !== 204) {
@@ -150,18 +154,18 @@ class CheesesView extends Component {
     }
 
     // otherwise update state by removing the cheese
-		this.setState(state => {
-			const cheeses = state.cheeses.filter(cheese => cheese.id !== cheeseID);
-			return { cheeses };
-		});
-	};
+    this.setState(state => {
+      const cheeses = state.cheeses.filter(cheese => cheese.id !== cheeseID);
+      return { cheeses };
+    });
+  };
 
   getCategoryCheeses = async categoryChangeEvent => {
     // extract the chosen option value from the event object
     const categoryID = categoryChangeEvent.target.value;
 
     // exit early if the same category ID is chosen
-		if (categoryID === this.state.categoryID) return;
+    if (categoryID === this.state.categoryID) return;
 
     // selects the "all cheeses" or "cheeses by category" endpoint depending on the category ID
     const endpoint = categoryID === "" ? "/cheeses" : `/cheeses/category/${categoryID}`;
@@ -169,36 +173,37 @@ class CheesesView extends Component {
     const res = // TODO: fetch the cheeses using the endpoint
     const cheeses = res.data;
 
-    // TODO: update state with the cheese list from the response
+    // updates state with the new categoryID and cheeses list
+    this.setState({ categoryID, cheeses });
   };
 
-	render() {
-		const { cheeses, categories, categoryID } = this.state;
+  render() {
+    const { cheeses, categories, categoryID } = this.state;
 
-		return (
-			<Container>
-				<Row>
+    return (
+      <Container>
+        <Row>
           <CheeseForm
             {/* TODO: complete the props for this component */}
           />
-				</Row>
-				<hr />
-				<Row>
-					<Col xs={12} md={8} lg={4}>
-						<CheeseCategorySelector
+        </Row>
+        <hr />
+        <Row>
+          <Col xs={12} md={8} lg={4}>
+            <CheeseCategorySelector
               {/* TODO: complete the props for this component */}
-						/>
-					</Col>
-				</Row>
-				<br />
+            />
+          </Col>
+        </Row>
+        <br />
         <CheesesList
           {/* TODO: complete the props for this component */}
-					// only show [remove] button if in 'All' category (categoryID is an empty string)
-					removeCheese={categoryID === "" && this.deleteCheese}
-				/>
-			</Container>
-		);
-	}
+          // only show [remove] button if in 'All' category (categoryID is an empty string)
+          removeCheese={categoryID === "" && this.deleteCheese}
+        />
+      </Container>
+    );
+  }
 }
 
 export default CheesesView;
@@ -206,11 +211,17 @@ export default CheesesView;
 
 ### Conditional Props
 
-You may be confused by this line `removeCheese={categoryID === "" && this.deleteCheese}`. This technique, [called the short circuit evaluation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_Operators#Short-circuit_evaluation) is often used in React ([the official docs refer to it as the in-line if](https://reactjs.org/docs/conditional-rendering.html#inline-if-with-logical--operator)) projects because of its simplicity and ability to be used in expression blocks.
+You may be confused by this line:
 
-Remember that `{}` blocks in JSX may only contain expressions. You can't use `if/else if/else` blocks in them! When you need to perform boolean logic you may use the [conditional operator (ternary expression)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator) to evaluate if / else scenarios. But the in-line if is even simpler to use.
+```js
+removeCheese={categoryID === "" && this.deleteCheese}
+```
 
-The name itself, short circuit evaluation, describes how it can be used. When evaluated it will either:
+This technique, [called the short circuit evaluation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_Operators#Short-circuit_evaluation), is often used in React projects because of its simplicity and ability to be used in expression blocks. [The official React docs refer to it as the in-line if](https://reactjs.org/docs/conditional-rendering.html#inline-if-with-logical--operator)
+
+Remember that `{}` expresion blocks in JSX may only contain expressions. You can't use `if/else if/else` blocks in them! When you need to perform boolean logic you may use the [conditional operator (ternary expression)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator) to evaluate if / else scenarios. But the short circuit evaluation is even simpler to use, even if its name sounds complicated!
+
+The name itself, short circuit evaluation, describes exactly what the expression does. When evaluated it will either:
 
 - "short circuit" by returning the first value
   - if the first value / expression (what is on the left) evaluates to a falsy value
@@ -234,8 +245,8 @@ So our behavior will be:
   - the `cheeseID` field is not an empty string
   - the expression "short circuits" and returns the first value, `false`
   - our `<CheeseList>` component
-  - will receive `false` in its `removeCheese` handler prop
-  - will not render the remove button next to each cheese
+    - will receive `false` in its `removeCheese` handler prop
+    - will not render the remove button next to each cheese
 - if we are in the "all cheeses" category then
   - the `cheeseID` field is an empty string
   - the expression "completes the circuit" and returns the second value, the `deleteCheese` method
@@ -276,26 +287,36 @@ Let's evaluate the dependency chain across the Child components we need to imple
 - `<CheesesList>`
   - depends on the `<CheeseForm>` that creates cheeses to display them in the table
     - indirectly depends on the `<CheeseCategorySelector>`
-- `<CheeseForm>
+- `<CheeseForm>`
   - depends on the `<CheeseCategorySelector>` since each cheese will need to have a category chosen before submitting
 - `<CheeseCategorySelector>`
   - no dependencies
 
-Given this order in the component dependency chain we should implement them in the following order:
+Given this order in the component dependency chain we can implement them in the following order:
 
 - `<CheeseCategorySelector>`
-- `<CheeseForm>
+- `<CheeseForm>`
 - `<CheesesList>`
+
+Note that this is a "dependency-first" approach to declarative cycling. You may find that an "known-first" approach is more fitting to your development flow. The dependency first approach is a single pass which ends with all the pieces being completed and usable. In the known-first case you would implement the components you understand first, shelling out the parts that don't exist yet, then looping back around to implement those shelled pieces:
+
+- `<CheesesList>` (simple rendering)
+- `<CheeseCategorySelector>` (simple rendering and reporting)
+- `<CheeseForm>` (complex, form validation, AJAX requests, etc.)
 
 ## The `<CheeseCategorySelector>` Component
 
-The Cheese Category Selector component is actually pretty simple because its purpose is just rendering and reporting. What's interesting is that this component will be our first dynamic component. It needs to be used by two Parent components that have very different behaviors - one of which we haven't even created yet! Let's explore the two uses cases.
+The Cheese Category Selector component is actually pretty simple because its purpose is just rendering and reporting. What we mean by this is that it will render a select menu and report the chosen result to the Parent component that rendered it. 
 
-It will be used by the `<CheesesView>` component to trigger a request for cheeses whenever a new category is chosen. It passes `"All Cheeses"` for the `firstOption` prop so that the first option in the select menu satisfies its use case of fetching all the cheeses.
+What's "complex" is that this component will be our first dynamic component. It needs to be used by two Parent components that have very different behaviors - one of which we haven't even created yet! Let's explore the two uses cases.
 
-We expect the`<CheeseForm>` component to use it for updating the form state for the `categoryID` field of the cheese that is being created. It should pass `"Select a Category"` as its `firstOption` prop to enforce the user selecting a category before submitting the form.
+The `<CheesesView>` component uses it to trigger a request for cheeses whenever a new category is chosen. It passes `"All Cheeses"` for the `firstOption` prop so that the first option in the select menu satisfies its use case of fetching all the cheeses.
 
-What both of these components have in common is that they hold the `categoryID` in their own state and change this state by handling the `onChange` event when the select menu is used. Because they each have different ways of handling this event we chose to name the prop more generically as `handleChange` and `categoryID`. This way the prop is used make sense both to the Parent component passing it and the `<CheeseCategorySelector>` that uses it. If it was confusing you, this also explains why the prop names themself are generic but the names of the state fields and methods that each Parent assigns to it are specific to their use case.
+Although it hasn't been implemented yet, we can expect the`<CheeseForm>` component to use it for updating the form `categoryID` state field of the cheese that is being created. It should pass `"Select a Category"` as its `firstOption` prop to enforce the user selecting a category before submitting the form.
+
+What both of these Parent components have in common is that they hold the `categoryID` in their own state and update that state field by handling the `onChange` event when the select menu is used. Because they each have different ways of handling this event we chose to name the props more generically as `handleChange` and `categoryID`. 
+
+Because of this generic naming the way the props are used make sense both to the Parent component passing them and the `<CheeseCategorySelector>` that uses them. If it was confusing you, this also explains why the prop names themselves are generic but the names of the state fields and methods that each Parent assigns to them are specific to their use case.
 
 The Cheese Selector component is responsible for:
 
@@ -310,16 +331,12 @@ Since this component is only responsible for rendering and reporting (through it
 - props
   - `firstOption`: (optional) the user facing text for the first option in the menu
   - `categories`: an array of category objects
-  - 2-way binding with the Parent component
-    - `handleChange`: the handler prop method provided by the Parent
-    - `categoryID`: from the Parent which controls option is considered "selected"
+  - 2-way binding with the Parent component - `handleChange`: the handler prop method provided by the Parent - `categoryID`: from the Parent which controls option is considered "selected"
 - utility functions
   - `createCategoryOption`: transforms a category into a JSX select option
 - rendering
   - a `<Form.Control>` component used as a `<select>` element
-  - adding a first option element
-    - its value should be an empty string (indicating it is an "empty" option)
-    - its inner text (user facing) should use the `firstOption` data prop
+  - adding a first option element - its value should be an empty string (indicating it is an "empty" option) - its inner text (user facing) should use the `firstOption` data prop
   - iterating over the categories list and transforming it into select options
 
 Your tasks
@@ -339,27 +356,27 @@ import Button from "react-bootstrap/Button";
 import { categoryPropType } from "../../utilities/prop-types";
 
 export const createCategoryOption = category => (
-	// TODO: return a JSX option using the category id and name
+  // TODO: return a JSX option using the category id and name
 );
 
 const CheeseCategorySelector = props => {
-	const { categoryID, categories, firstOption, handleChange } = props;
+  const { categoryID, categories, firstOption, handleChange } = props;
 
-	return (
-		<Form.Control
-			as="select"
-			name="categoryID"
-			value={categoryID}
-			onChange={handleChange}
+  return (
+    <Form.Control
+      as="select"
+      name="categoryID"
+      value={categoryID}
+      onChange={handleChange}
     >
       {/* TODO: implement the first option */}
-			{/* TODO: transform the categories into options */}
-		</Form.Control>
-	);
+      {/* TODO: transform the categories into options */}
+    </Form.Control>
+  );
 };
 
 CheeseCategorySelector.propTypes = {
-	// TODO: implement the prop types
+  // TODO: implement the prop types
 };
 
 CheeseCategorySelector.defaultProps = {

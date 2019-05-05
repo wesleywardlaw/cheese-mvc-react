@@ -1,13 +1,14 @@
 # Base Configuration
+
 - [previous: `0-intro`](./0-intro.md)
 - [next: `2-categories-view`](./2-categories-view.md)
 - topics
-	- Create React App
-	- installing dependencies
-	- React Router configuration
+  - Create React App
+  - installing dependencies
+  - React Router configuration
 - components
-	- `<CheeseNav>`
-	- `<Footer>`
+  - `<CheeseNav>`
+  - `<Footer>`
 
 ## Create React App
 
@@ -35,7 +36,11 @@ In the `src/` directory
 ```js
 import React, { Component } from "react";
 
-const App = () => <div />;
+const App = () => (
+  <div>
+    {/* we will fill this part in soon! */}
+  </div>
+);
 
 export default App;
 ```
@@ -58,18 +63,18 @@ In the `public/` directory
 ```html
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1, shrink-to-fit=no"
-		/>
-		<title>Cheese React SPA</title>
-	</head>
-	<body>
-		<noscript>You need to enable JavaScript to run this app.</noscript>
-		<div id="root"></div>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Cheese React SPA</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
 </html>
 ```
 
@@ -124,7 +129,12 @@ First create a `Routes.js` file in the `src/` directory. You want this file to b
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 
-const Routes = () => <Switch>{/* <Route exact path='' component={} */}</Switch>;
+const Routes = () => (
+  <Switch>
+    {/* we will implement these Route components later */}
+    <Route exact path="" component={} />
+  </Switch>
+);
 
 export default Routes;
 ```
@@ -144,9 +154,9 @@ import { BrowserRouter as Router } from "react-router-dom";
 import Routes from "./Routes";
 
 const App = () => (
-	<Router>
-		<Routes />
-	</Router>
+  <Router>
+    <Routes />
+  </Router>
 );
 
 export default App;
@@ -192,13 +202,14 @@ import NavBar from "react-bootstrap/NavBar";
 import { LinkContainer } from "react-router-bootstrap";
 
 const CheeseNav = () => (
-	<NavBar>
-		<Nav>
-			<LinkContainer to="/some/path/to/navigate">
-				<Nav.Link>User Facing Link Text</Nav.Link>
-			</LinkContainer>
-		</Nav>
-	</NavBar>
+  <NavBar>
+    <Nav>
+      <LinkContainer to="/some/path/to/navigate">
+        <Nav.Link>User Facing Link Text</Nav.Link>
+      </LinkContainer>
+      {/* TODO: implement the links */}
+    </Nav>
+  </NavBar>
 );
 
 export default CheeseNav;
@@ -216,17 +227,16 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 const Footer = () => (
-	<footer className="fixed-bottom">
-		<Row className="text-center">
-			<Col xs={12}>
-				Coded by{" "}
-				<a href="https://github.com/the-vampiire" target="_blank">
-					{" "}
-					Vamp
-				</a>
-			</Col>
-		</Row>
-	</footer>
+  <footer className="fixed-bottom">
+    <Row className="text-center">
+      <Col xs={12}>
+        Coded by
+        <a href="https://github.com/YOUR_USERNAME" target="_blank">
+          YOUR_NAME
+        </a>
+      </Col>
+    </Row>
+  </footer>
 );
 
 export default Footer;
@@ -247,11 +257,11 @@ import CheeseNav from "./components/CheeseNav";
 import Footer from "./components/Footer";
 
 const App = () => (
-	<Router>
-		<CheeseNav />
-		<Routes />
-		<Footer />
-	</Router>
+  <Router>
+    <CheeseNav />
+    <Routes />
+    <Footer />
+  </Router>
 );
 
 export default App;
@@ -276,17 +286,18 @@ import CheeseNav from "./components/CheeseNav";
 import Footer from "./components/Footer";
 
 const App = () => (
-	<Router>
-		<Fragment>
-			<CheeseNav />
-			<Routes />
-			<Footer />
-		</Fragment>
-	</Router>
+  <Router>
+    <Fragment>
+      <CheeseNav />
+      <Routes />
+      <Footer />
+    </Fragment>
+  </Router>
 );
 
 export default App;
 ```
 
 # Section Complete
+
 Next let's begin with the [Views & Components](./2-categories-view.md)
