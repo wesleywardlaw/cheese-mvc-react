@@ -177,36 +177,36 @@ import CategoriesList from "../components/Category/CategoriesList";
 import CategoryForm from "../components/Category/CategoryForm";
 
 class CategoriesView extends Component {
-	state = {
-		// TODO: declare initial state
-	};
+  state = {
+    // TODO: declare initial state
+  };
 
-	async componentDidMount() {
-		// request doesnt exist yet but we expect it to behave this way
-		// meaning execute an HTTP GET request at api-domain/categories
-		const res = await request.get("/categories");
-		const categories = res.data; // the response data is the category collection list
+  async componentDidMount() {
+    // request doesnt exist yet but we expect it to behave this way
+    // meaning execute an HTTP GET request at api-domain/categories
+    const res = await request.get("/categories");
+    const categories = res.data; // the response data is the category collection list
 
-		// TODO: implement updating state with the categories from the API
-	}
+    // TODO: implement updating state with the categories from the API
+  }
 
-	addToCategories = category =>
-		this.setState(state => {
-			const { categories } = state;
-			// TODO: implement returning a new state with the category added to categories list
-		});
+  addToCategories = category =>
+    this.setState(state => {
+      const { categories } = state;
+      // TODO: implement returning a new state with the category added to categories list
+    });
 
-	render() {
-		const { categories } = this.state;
+  render() {
+    const { categories } = this.state;
 
-		return (
-			<Container>
-				<Row>{/* TODO: declare the CategoryForm component and props */}</Row>
-				<br />
-				<Row>{/* TODO: declare the CategoriesList component and props */}</Row>
-			</Container>
-		);
-	}
+    return (
+      <Container>
+        <Row>{/* TODO: declare the CategoryForm component and props */}</Row>
+        <br />
+        <Row>{/* TODO: declare the CategoriesList component and props */}</Row>
+      </Container>
+    );
+  }
 }
 
 export default CategoriesView;
@@ -250,10 +250,10 @@ Below is a the `api-request` module. It is a [custom Axios instance](https://www
 import axios from "axios";
 
 const request = axios.create({
-	baseURL: process.env.REACT_APP_API_DOMAIN,
-	headers: {
-		"Content-Type": "application/json",
-	},
+  baseURL: process.env.REACT_APP_API_DOMAIN,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 export default request;
@@ -435,13 +435,13 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 class ComponentName extends Component {
-	static propTypes = {
-		propName: PropTypes.string, // or any other prop type
-	};
+  static propTypes = {
+    propName: PropTypes.string, // or any other prop type
+  };
 
-	static defaultProps = {
-		propName: "default value", // whatever value you want as a default
-	};
+  static defaultProps = {
+    propName: "default value", // whatever value you want as a default
+  };
 }
 ```
 
@@ -479,12 +479,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 const propTypes = {
-	propName: PropTypes.func.isRequired, // any other type, .isRequired is optional
+  propName: PropTypes.func.isRequired, // any other type, .isRequired is optional
 };
 
 class ComponentName extends Component {
-	// internal
-	static propTypes = propTypes;
+  // internal
+  static propTypes = propTypes;
 }
 
 // external: assign the propTypes object after the component has been defined
@@ -508,7 +508,7 @@ Let's implement the prop types for the `<CategoryForm>` component as an example.
 
 ```js
 CategoryForm.propTypes = {
-	addCategory: PropTypes.func.isRequired,
+  addCategory: PropTypes.func.isRequired,
 };
 ```
 
@@ -516,7 +516,7 @@ As an example here is how you would provide a default value
 
 ```js
 CategoryForm.defaultProps = {
-	addCategory: () => {},
+  addCategory: () => {},
 };
 ```
 
@@ -601,22 +601,22 @@ In this component we expect an array of `CategoryEntity` shaped objects. At the 
 ```js
 // CheeseEntity
 {
-	id: Number;
-	name: String;
-	description: String;
-	category: CategoryEntity;
+  id: Number;
+  name: String;
+  description: String;
+  category: CategoryEntity;
 }
 
 // CategoryEntity
 {
-	id: Number;
-	name: String;
+  id: Number;
+  name: String;
 }
 
 // MenuEntity
 {
-	id: Number;
-	name: String;
+  id: Number;
+  name: String;
 }
 ```
 
@@ -646,7 +646,7 @@ import { categoryShape } from "../../utilities/prop-types";
 // component code
 
 CategoriesList.propTypes = {
-	categories: PropTypes.arrayOf(categoryShape).isRequired,
+  categories: PropTypes.arrayOf(categoryShape).isRequired,
 };
 ```
 
