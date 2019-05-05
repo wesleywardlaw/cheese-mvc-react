@@ -60,22 +60,22 @@ Walkthrough for a Cheese MVC React SPA + REST API build.
 ```js
 // CheeseEntity
 {
-	id: Number;
-	name: String;
-	description: String;
-	category: CategoryEntity;
+  id: Number;
+  name: String;
+  description: String;
+  category: CategoryEntity;
 }
 
 // CategoryEntity
 {
-	id: Number;
-	name: String;
+  id: Number;
+  name: String;
 }
 
 // MenuEntity
 {
-	id: Number;
-	name: String;
+  id: Number;
+  name: String;
 }
 ```
 
