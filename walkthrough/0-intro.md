@@ -92,7 +92,7 @@ Walkthrough for a Cheese MVC React SPA + REST API build.
     - `GET`: get the cheese details
       - response: `CheeseEntity`
     - `DELETE`: delete the cheese
-      - response status: `200`
+      - response status: `204`
   - cheeses collection by category: `/cheeses/category/:categoryID`
     - `GET`: get all the cheeses for the category
       - response: `[CheeseEntity]`
@@ -121,7 +121,7 @@ Walkthrough for a Cheese MVC React SPA + REST API build.
       - response: `CheeseEntity`
     - `DELETE`: remove a cheese from the menu
       - request data: `{ cheeseID }`
-      - response status: `200`
+      - response status: `204`
 
 # Background
 Up until now we have built all of our client-facing frontends using server side rendering [SSR] with templates. Recall that dynamic websites use SSR to render a template according to the context of the request. The context carried information about the path and method, requesting user, what they wanted to see, and other details that affected what we rendered in response. When views are rendered according to context they are referred to as dynamic sites rather than static, hard-coded, HTML.
@@ -147,7 +147,7 @@ The solution to both of these examples of bad UX are to use AJAX requests. We in
 
 Back when the term was coined the primary encoding format used was for transmitting data over HTTP was XML. This is the same format used to configure parts of Spring applications. In modern JavaScript, and many other web-facing languages, nearly all communication of data uses the newer encoding standard called JSON.
 
-JSON stands for JavaScript Object Notation and is a way to share JavaScript-styled objects, key-value data structures, over HTTP. Because HTTP needs to be agnostic of the implementing language (Java, Python, JavaScript, etc.) it can only transmit String data. JSON encoding lets us send and receive complex objects of data while still adhering to the String format expected by HTTP.
+JSON stands for JavaScript Object Notation and is a way to share JavaScript-styled objects, key-value data structures, over HTTP. Because HTTP needs to be agnostic of the implementing language (Java, Python, JavaScript, etc.) it can only transmit simple data like strings, numbers, booleans, and null. JSON encoding lets us send and receive complex objects of data by converting them into a String format accepted by the HTTP.
 
 Modern JavaScript usage of AJAX requests communicate primarily through JSON but the term has been ubiquitous for so long that it hasn't, and likely never will, be renamed to AJAJ(SON)!
 
