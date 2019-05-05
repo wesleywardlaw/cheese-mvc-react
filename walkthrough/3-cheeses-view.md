@@ -291,9 +291,9 @@ Given this order in the component dependency chain we should implement them in t
 
 The Cheese Category Selector component is actually pretty simple because its purpose is just rendering and reporting. What's interesting is that this component will be our first dynamic component. It needs to be used by two Parent components that have very different behaviors - one of which we haven't even created yet! Let's explore the two uses cases.
 
-It will be used by the `<CheesesView>` component to trigger a request for cheeses whenever a new category is chosen. It passes `"All Cheeses"` for the `firstOption` prop so that the first option in the select menu satisfies its use case of fetching all the cheeses. 
+It will be used by the `<CheesesView>` component to trigger a request for cheeses whenever a new category is chosen. It passes `"All Cheeses"` for the `firstOption` prop so that the first option in the select menu satisfies its use case of fetching all the cheeses.
 
-We expect the`<CheeseForm>` component to use it for updating the form state for the `categoryID` field of the cheese that is being created. It should pass `"Select a Category"` as its `firstOption` prop to enforce the user selecting a category before submitting the form.  
+We expect the`<CheeseForm>` component to use it for updating the form state for the `categoryID` field of the cheese that is being created. It should pass `"Select a Category"` as its `firstOption` prop to enforce the user selecting a category before submitting the form.
 
 What both of these components have in common is that they hold the `categoryID` in their own state and change this state by handling the `onChange` event when the select menu is used. Because they each have different ways of handling this event we chose to name the prop more generically as `handleChange` and `categoryID`. This way the prop is used make sense both to the Parent component passing it and the `<CheeseCategorySelector>` that uses it. If it was confusing you, this also explains why the prop names themself are generic but the names of the state fields and methods that each Parent assigns to it are specific to their use case.
 
