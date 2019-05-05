@@ -33,8 +33,10 @@ The declarative cycling approach can be applied to any type of development. In f
         - if the function is shared
           - create the file and import it
     - its props
-      - their names (defined in the Parent that renders the component)
-      - how they will be used
+      - its name (defined in the Parent that renders the component)
+      - how it is to be used
+      - is it required (will the component break without this prop)?
+      - should it have a default value?
     - its state
       - declarative names
       - initial values
