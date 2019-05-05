@@ -536,10 +536,12 @@ Because this component's responsibilities revolve around rendering behavior only
 - props
   - `categories`: the list of categories
     - used for creating category rows in the table
+- utility functions
+  - `createCategoryRow`: transforms a category into a JSX table row
 - rendering
   - `<Table>`: container for holding the category rows
     - a header row
-    - iterating over the `categories` to create category rows
+    - iterating over the `categories` to transform it into category rows
 
 Your tasks:
 
@@ -556,7 +558,7 @@ import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
 
-const categoryRow = category => (
+const createCategoryRow = category => (
   // TODO: implement this utility function
   // it should return a row and column with the category name
 );
