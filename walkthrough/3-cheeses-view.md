@@ -3,15 +3,20 @@
 - [previous: `2-categories-view.md`](./2-categories-view.md)
 - [next: `4-menus-view.md`](./4-menus-view.md)
 - topics
-  - a
+  - conditional props
+  - complex component interactions
 - components
-  - a
+  - `<CheesesView>`
+  - `<CheeseForm>`
+  - `<CheeseCategorySelector>`
+  - `<CheesesList>`
 
 Now that we have completed the Categories View it's time to implement the next piece of our dependency chain - the Cheeses View. It will have a form to add a new cheese and a table of cheeses with the ability to view cheeses per category. This is the most complex set of components for this project. The good news is that you will learn a lot implementing it!
 
-Our Cheese View will be made up of three sub-components. The `<CheesesList>` component will render a table of cheeses with their name, category (name), and description. The `<CheeseCategorySelector>` component will provide a dropdown menu for selecting a category and a button for firing a request for the cheeses in that category. Finally, the `<CheeseForm>` component will be responsible for receiving user input of the name, category, and description and submitting this data to the backend for Cheese creation.
+Our Cheese View will be made up of three sub-components. The `<CheesesList>` component will render a table of cheeses with their name, category (name), and description. The `<CheeseCategorySelector>` component will provide a dropdown menu for selecting a category. When the dropdown menu changes we will use the `onChange` event to fetch cheeses for the chosen category. Finally, the `<CheeseForm>` component will be responsible for receiving user input of the name, category, and description and submitting this data to the backend for Cheese creation.
 
 ## The `<CheesesView>` Component
+
 The Cheeses View component is responsible for:
 
 - rendering a form component for creating a new cheese
@@ -44,9 +49,10 @@ With these requirements in mind lets begin with the **Declaration** step of the 
       - sends a delete request
       - removes the cheese from its cheeses list
     - `changeCategory`: receives a category ID and fetches the cheese collection for that category
-      - if the category ID is `''` then fetch all the cheeses
+      - uses the `getCategoryCheeses` utility function
 - utility functions
   - `getCategoryCheeses`: receives a category ID and fetches the cheeses for that category
+    - if the category ID is `''` then it fetches all the cheeses
 - rendering
   - grid `<Container>`: to hold and position its children
     - `<CheeseForm>`
@@ -59,7 +65,7 @@ With these requirements in mind lets begin with the **Declaration** step of the 
       - data props
         - `categories` list
       - handler props
-        - `setCategory` to use the `changeCategory` method
+        - `handleChange` to use the `changeCategory` method
     - `<CheesesList>`
       - data props
         - `cheeses` list
@@ -129,7 +135,7 @@ class CheesesView extends Component {
 	async componentDidMount() {
     const cheeseRes = // TODO: implement a request to the cheeses collection
     const cheeses = cheeseRes.data;
-    
+
     const categoriesRes = // TODO: implement a request to the categories collection
     const categories = categoriesRes.data;
 
@@ -197,3 +203,65 @@ class CheesesView extends Component {
 
 export default CheesesView;
 ```
+
+### Conditional Props
+
+You may be confused by this line `removeCheese={categoryID === "" && this.deleteCheese}`. This technique, [called the short circuit evaluation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_Operators#Short-circuit_evaluation) is often used in React projects because of its simplicity and ability to be used in expression blocks.
+
+Remember that `{}` blocks in JSX may only contain expressions. You can't use `if/else if/else` blocks in them! When you need to perform boolean logic you may use the [conditional operator (ternary expression)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator) to evaluate if / else scenarios. But the "short circuit" in-line if can be used when the else condition only needs to return a falsey value.
+
+Check out these links if you need a refresher on [truthy values](https://developer.mozilla.org/en-US/docs/Glossary/truthy) and [falsy values](https://developer.mozilla.org/en-US/docs/Glossary/Falsy).
+
+This techniques is useful for times when you want to conditionally pass a prop or render content. To wrap your head around how it works open up `node` on the command line and try pasting in some of these examples:
+
+```js
+// if the operand on the left is true (or a truthy value)
+// then the operand on the right will be returned after evaluation
+true && "i got returned from the evaluation";
+
+// a non-empty string is a "truthy" value
+"non empty string" && "i got returned from the evaluation";
+
+// if  the operand on the left is false (or a falsy value)
+// then it will be returned after evaluation
+false && "i did not get returned from the evaluation";
+// false is returned
+
+undefined && "i did not get returned from the evaluation";
+// undefined is returned
+```
+
+In our case we are saying "if the category ID is truthy (not an empty string)" then pass the handler prop. Otherwise pass the "falsy" value that caused the expression to short circuit. Inside the `<CheesesList>` component we will check if the (optional) handler prop is a function (a truthy value).
+
+If it is then we will use it by rendering a remove button next to each cheese. If its value is `false` then we know we must be in a specific category of cheeses (since `cheeseID === ""` will evaluate to `false`) and should not render the remove button.
+
+You can simulate this in `node` with the following code
+
+```js
+// try changing the categoryID from an empty string to a number greater than 1 (simulating a category ID)
+categoryID = "";
+
+// then rerun the following expression with different values to see the result
+categoryID === "" && "the handler method was provided";
+
+// categoryID is not an empty string: returns false
+// categoryID is an empty string: returns 'the handler method was provided'
+```
+
+Let's evaluate the dependency chain across the Child components we need to implement:
+
+- `<CheesesList>`
+  - depends on the `<CheeseForm>` that creates cheeses to display in the table
+    - indirectly depends on the `<CheeseCategorySelector>`
+- `<CheeseForm>
+  - depends on the `<CheeseCategorySelector>` since each cheese will need to have a category chosen before submitting
+- `<CheeseCategorySelector>`
+  - no dependencies
+
+Given this order in the component dependency chain we should implement them in the following order:
+
+- `<CheeseCategorySelector>`
+- `<CheeseForm>
+- `<CheesesList>`
+
+## The `<CheeseCategorySelector>` Component
