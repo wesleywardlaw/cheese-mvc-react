@@ -489,7 +489,7 @@ this.setState(currentState => {
 });
 ```
 
-The reason for this is that component state is set asychronously. React's uses an efficient rendering approach that will batch state updates and execute them at the most efficient time. When state is actually set may not be when you expect. Because this process occurs asynchronously we can not rely on the current value of state (or props) from `this.state` as it may be "out of sync" by the time `setState()` is processed.
+The reason for this is that component state is set asychronously. React's uses an efficient rendering approach that will batch state updates and execute them at the most efficient time. When state is actually set may not be when you expect. Because this process occurs asynchronously we can not rely on the current value of state (or props) from `this.state/.props` as it may be "out of sync" by the time `setState()` is processed. You can read more about the React reasoning from one of the most well known React developers [@gaearon](https://github.com/facebook/react/issues/11527#issuecomment-360199710).
 
 ```js
 // DON'T DO THIS!
@@ -643,6 +643,8 @@ for (const entry of Object.entries(fields)) {
 
 Within the loop we have several options for performing validations according to the input `name`. Since we only have two validation options (character limits and non-empty string) we can write this logic in the loop. Preferably this should be moved to its own function for a more declarative style. Especially if we had more fields or validation options.
 
+Notice that we provide no mechanism for the `disabled` flag to ever be set `false` again within the loop. This is to ensure we do not ever get a `false` positive, damn that was a fitting pun.
+
 ```js
 const shouldDisable = fields => {
   // disabled flag, notice we use "let"
@@ -690,6 +692,33 @@ const shouldDisable = fields => {
 
   return disabled;
 };
+
+// or more declaratively using a validator function
+
+const shouldDisable = fields => {
+  let disabled = false;
+
+  for (const [fieldName, value] of Object.entries(fields)) {
+    if (isFieldInvalid(fieldName, value)) {
+      disabled = true;
+    }
+  }
+
+  return disabled;
+};
+
+const isFieldInvalid = (fieldName, value) => {
+  // we can utilize the "return" exit strategy of a function
+  // this leads to cleaner looking code
+  switch (fieldName) {
+    case "name":
+      return value.length < 3 || value.length > 15;
+    case "description":
+    case "categoryID":
+    default:
+      return value === "";
+  }
+}
 ```
 
 The `switch` statement gives us greater flexibility. For now we set `description` and `categoryID` to "fall through" to the default case which checks if the value is an empty string. In the future if we wanted more specific validation for these fields we could simply add them to their respective cases. And if our form introduces new fields we can add more cases to handle them.
@@ -735,7 +764,7 @@ class CheeseForm extends Component {
     const { name, value } = event.target;
 
     this.setState(currentState => {
-      // TODO: implement the rest of the dynamic input change handler
+      // TODO: implement the rest of the change handler
 
       return { fields, disabled };
     });
@@ -750,7 +779,7 @@ class CheeseForm extends Component {
     const res = // use the correct request method, endpoint, and data
     const cheese = res.data;
 
-    // TODO: give the new cheese data to the Cheeses View Parent
+    // TODO: report the new cheese data to the <CheesesView> Parent
     this.resetForm();
   }
 
@@ -773,11 +802,7 @@ class CheeseForm extends Component {
           </Form.Group>
           <Form.Group as={Col}>
             <Form.Label>Cheese Category</Form.Label>
-            <CheeseCategorySelector
-              categories={categories}
-              categoryID={categoryID}
-              handleChange={this.handleInputChange}
-            />
+            {/* TODO: render the <CheeseCategorySelector> with appropriate props */}
           </Form.Group>
         </Form.Row>
 
