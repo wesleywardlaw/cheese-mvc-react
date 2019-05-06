@@ -118,13 +118,12 @@ src/
 import React, { Component } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 
 import request from "../utilities/api-request";
-import CheesesList from "../components/Cheese/CheesesList";
-import CheeseForm from "../components/Cheese/CheeseForm";
-import CheeseCategorySelector from "../components/Cheese/CheeseCategorySelector";
+import CheesesList from "../components/cheese/CheesesList";
+import CheeseForm from "../components/cheese/CheeseForm";
+import CheeseCategorySelector from "../components/cheese/CheeseCategorySelector";
 
 class CheesesView extends Component {
   state = {
@@ -147,7 +146,7 @@ class CheesesView extends Component {
       // TODO: return the new state that merges the cheeses list with the new cheese
     });
 
-  removeFromCheeses = async cheeseID => {
+  deleteCheese = async cheeseID => {
     const res = // TODO: implement a request to the correct endpoint to delete the cheese (be mindful of the HTTP method you need)
 
     // if the DELETE request was unsuccessful exit early
@@ -164,23 +163,23 @@ class CheesesView extends Component {
 
   getCategoryCheeses = async categoryChangeEvent => {
     // extract the chosen option value from the event object
-    const categoryID = categoryChangeEvent.target.value;
+    const selectedCategoryID = categoryChangeEvent.target.value;
 
     // exit early if the same category ID is chosen
-    if (categoryID === this.state.categoryID) return;
+    if (selectedCategoryID === this.state.selectedCategoryID) return;
 
     // selects the "all cheeses" or "cheeses by category" endpoint depending on the category ID
-    const endpoint = categoryID === "" ? "/cheeses" : `/cheeses/category/${categoryID}`;
+    const endpoint = selectedCategoryID === "" ? "/cheeses" : `/cheeses/category/${selectedCategoryID}`;
 
     const res = // TODO: fetch the cheeses using the endpoint
     const cheeses = res.data;
 
-    // updates state with the new categoryID and cheeses list
-    this.setState({ categoryID, cheeses });
+    // updates state with the new selectedCategoryID and cheeses list
+    this.setState({ selectedCategoryID, cheeses });
   };
 
   render() {
-    const { cheeses, categories, categoryID } = this.state;
+    const { cheeses, categories, selectedCategoryID } = this.state;
 
     return (
       <Container>
@@ -190,18 +189,18 @@ class CheesesView extends Component {
           />
         </Row>
         <hr />
-        <Row>
+        <Row className="text-center">
           <Col xs={12} md={8} lg={4}>
+            <h5>Cheeses by Category</h5>
             <CheeseCategorySelector
               {/* TODO: complete the props for this component */}
             />
           </Col>
         </Row>
-        <br />
         <CheesesList
           {/* TODO: complete the props for this component */}
-          // only show [remove] button if in 'All' category (categoryID is an empty string)
-          removeCheese={categoryID === "" && this.deleteCheese}
+          // only show [remove] button if in 'All' category (selectedCategoryID is an empty string)
+          removeCheese={selectedCategoryID === "" && this.deleteCheese}
         />
       </Container>
     );
@@ -216,7 +215,7 @@ export default CheesesView;
 You may be confused by this line:
 
 ```js
-removeCheese={categoryID === "" && this.deleteCheese}
+removeCheese={selectedCategoryID === "" && this.deleteCheese}
 ```
 
 This technique, [called the short circuit evaluation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_Operators#Short-circuit_evaluation), is often used in React projects because of its simplicity and ability to be used in expression blocks. [The official React docs refer to it as the in-line if](https://reactjs.org/docs/conditional-rendering.html#inline-if-with-logical--operator)
@@ -236,9 +235,9 @@ The name itself, short circuit evaluation, describes exactly what the expression
 
 In our case:
 
-- the first value will be what is returned from evaluating the expression `categoryID === ""`
-  - `true`: if the category is "all cheeses" then the categoryID is an empty `""`
-  - `false`: if the category is a specific category then the categoryID will be a positive number not an empty string
+- the first value will be what is returned from evaluating the expression `selectedCategoryID === ""`
+  - `true`: if the category is "all cheeses" then the selectedCategoryID is an empty `""`
+  - `false`: if the category is a specific category then the selectedCategoryID will be a positive number not an empty string
 - the second value is the `deleteCheese` method
 
 So our behavior will be:
@@ -275,8 +274,8 @@ false && "i did not get returned from the evaluation";
 You can simulate our example in `node` with the following code
 
 ```js
-categoryID = "";
-categoryID === "" && "the handler method was provided";
+selectedCategoryID = "";
+selectedCategoryID === "" && "the handler method was provided";
 
 // categoryID is not an empty string: returns false
 // categoryID is an empty string: returns 'the handler method was provided'
@@ -352,13 +351,11 @@ Your tasks
 `src/components/cheese/CheeseCategorySelector`
 
 ```js
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
 
-import { categoryPropType } from "../../utilities/prop-types";
+import { categoryType } from "../../utilities/prop-types";
 
 export const createCategoryOption = category => (
   // TODO: return a JSX option using the category id and name
@@ -641,7 +638,7 @@ for (const entry of Object.entries(fields)) {
 }
 ```
 
-Within the loop we have several options for performing validations according to the input `name`. Since we only have two validation options (character limits and non-empty string) we can write this logic in the loop. Preferably this should be moved to its own function for a more declarative style. Especially if we had more fields or validation options.
+Within the loop there are many ways of performing validations. Since we only have two validation options (character limits and non-empty string) we can write this logic in the loop itself. Preferably this should be moved to its own function for a more declarative style. Especially if we had more fields or validation options.
 
 Notice that we provide no mechanism for the `disabled` flag to ever be set `false` again within the loop. This is to ensure we do not ever get a `false` positive, damn that was a fitting pun.
 
@@ -736,15 +733,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
 import request from '../../utilities/api-request';
-import { categoryPropType } from '../../utilities/prop-types';
+import { categoryType } from '../../utilities/prop-types';
 import CheeseCategorySelector from "./CheeseCategorySelector";
 
-const shouldDisable(formFields) {
-  // TODO: implement
+const shouldDisable = formFields => {
+  // TODO: implement the utility
 }
 
 // we write the initial state object externally
@@ -788,10 +784,11 @@ class CheeseForm extends Component {
     const { disabled, fields: { name, description, categoryID } } = this.state;
 
     return (
-      <Form>
+      <Form className="text-center">
+        <h2>Create a Cheese</h2>
         <Form.Row>
           <Form.Group as={Col}>
-            <Form.Label>Name</Form.Label>
+            <Form.Label>Cheese Name</Form.Label>
             <Form.Control
               name='name'
               value={name}
@@ -808,7 +805,7 @@ class CheeseForm extends Component {
 
         <Form.Row>
           <Form.Group as={Col}>
-            <Form.Label>Description</Form.Label>
+            <Form.Label>Cheese Description</Form.Label>
             <Form.Control
               required
               name='description'
