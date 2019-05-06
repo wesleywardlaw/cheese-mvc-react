@@ -421,7 +421,35 @@ This component, like every form component in React, requires a sense of state to
   - `shouldDisable`: receives the form data and returns the new value for `disabled`
     - used every time an input value is changed to ensure all values are valid before enabling submission
 - rendering
-  -
+  - `<Form>`: container for holding input elements
+  - input components
+    - all will receive the following attribute props
+    - all will receive the following event props
+    - a text input for the `description` field
+      - attribute props
+        - `name` the name of the input field
+        - `value` for 2-way binding with the form state
+      - event props
+        - `onChange` for managing 2-way binding with the form state
+    - a text input for the `name` field
+      - attribute props
+        - `name` the name of the input field
+        - `value` for 2-way binding with the form state
+        - `minLength` for providing validation cues
+        - `maxLength` for providing validation cues
+      - event props
+        - `onChange` for managing 2-way binding with the form state
+  - the `<CheeseCategorySelector>` component
+    - data props
+      - `categories` list
+      - `categoryID` for 2-way binding with the form state
+    - handler props
+      - `handleChange` for 2-way binding with the form state
+  - a submit button
+    - attribute props
+      - `disabled` for controlling whether the form is allowed to be submitted
+    - event props
+      - `onClick` for submitting the form
 
 ### Multi-Input Forms & Validation
 
@@ -447,16 +475,21 @@ this.setState({ field: value });
 resetForm = () => this.setState(initialState);
 ```
 
-However, if you are using data from the current state when setting a new state you must use a callback inside `setState()` instead of an object. The callback receives current state as an argument and you should return a new state object from it.
+However, if you are using data from the current state when setting a new state you must use a callback inside `setState()` instead of an object. The callback receives current state and props as arguments should return the new state as an object.
 
 ```js
-this.setState(currentState => {
-	// derive new state using currentState
+this.setState((currentState, currentProps) => {
+	// derive new state using currentState / currentProps
 	// return an object with the updated state
+});
+
+// most of the time you just need current state
+this.setState(currentState => {
+	// derive and return new state
 });
 ```
 
-The reason for this is that component state is set asychronously due to React's efficient rendering approach. It will batch state updates and execute them at the most efficient moment, which may not be when you expect them to be executed. Because this process occurs asynchronously we can not rely on the current value of state from `this.state` as it may be "out of sync" by the time `setState()` is processed.
+The reason for this is that component state is set asychronously. React's uses an efficient rendering approach that will batch state updates and execute them at the most efficient time. When state is actually set may not be when you expect. Because this process occurs asynchronously we can not rely on the current value of state (or props) from `this.state` as it may be "out of sync" by the time `setState()` is processed.
 
 ```js
 // DON'T DO THIS!
@@ -533,7 +566,8 @@ handleInputChange = event => {
 		// we current state fields to merge with the new value
 		const { fields } = currentState;
 
-		// we need to copy current fields into a new object so as not to directly mutate it
+		// we need to copy current fields into a new object
+		// it is a best practice to never mutate function arguments (currentState) directly
 		// we can use the spread operator as a shorthand since all the field properties are primitives
 		const updatedFields = { ...fields };
 
@@ -553,10 +587,13 @@ handleInputChange = event => {
 	const { name, value } = event.target;
 
 	this.setState(currentState => {
-    const fields = { ...currentState.fields, [name]: value };
-    // same as
-    // const fields = { ...currentState.fields };
-    // fields[name] = value;
+		const fields = { ...currentState.fields, [name]: value };
+		// same as
+		// const fields = { ...currentState.fields };
+		// fields[name] = value;
+
+		// if you are setting a property in an object with the same name
+		// you do not need to write { fields: fields }, thanks ES6!
 		return { fields };
 	});
 };
@@ -567,12 +604,98 @@ handleInputChange = ({ target: { name, value } }) =>
 ```
 
 ### Multi-Input Form Validation
-Now that we have completed the dynamic input change handler it's time to think about validation of the field values. Form validation can be done in a variety of different ways from custom implementations to using third party libraries. Before getting lost in the process remember to keep your end goal in mind. 
 
-We have a field in state called `disabled` that controls whether the submit button can be clicked. We have fields with values that we want to validate. Our end goal is to check the fields, according to the input requirements, and return a 
+Now that we have completed the dynamic input change handler it's time to think about validation of the field values. Form validation can be done in a variety of different ways from custom implementations to using third party libraries. Before getting lost in the process remember to keep your end goal in mind.
 
+We have a field in state called `disabled` that controls whether the submit button can be clicked. We have fields with values that we want to validate. Our end goal is to check the fields, according to the input requirements, and determine a boolean value for `disabled` to be set to. We will cover one approach here but remember as long as the end goal is met and the code is readable feel free to implement validation any way you would like.
 
-Your tasks
+First let's analyze our validation requirements. The cheese `name` must be between 3 and 15 characters. The cheese `description` and `categoryID` must not be empty strings. Recall that `<CheeseCategorySelector>` provides a first option with an empty string as a value - an invalid option that is used aesthetically to show some first option text to the user. So we can see that the `description` and `categoryID` are valid as long as they are not empty strings.
+
+Next let's consider how we will implement validation. We need to validate all the fields whenever an input changes. Why all the fields? Because if we change `disabled` to `false` based on the valid value of a single input then we may let other invalid inputs slip through. There, you've just been spared several hours of debugging!
+
+Since we have to validate all the fields we will need to iterate over them. We can use `Object.values/keys/entries` to loop over an object. In this case we need both the `name` and `value` of the field to differentiate which validation rule we are checking. Since we need both the key and the value of each property we should use `Object.entries()`. We will be performing this behavior many times so we should create a function which receives a fields object and returns a boolean that `disabled` can be set to.
+
+We will use the "flag and loop" approach for this function. Our flag will be the value we want to return, `disabled`. We will initialize it as `false` and control its value within the validation loop. If one or more field validations fail we set the flag to `true` to indicate that the form should be disabled. If the validations all pass then the flag will never be changed from `false` indicating that our form is ready to submit.
+
+```js
+const shouldDisable = fields => {
+	// disabled flag, notice we use "let"
+	// this is to allow the variable to be re-assigned in the loop
+	let disabled = false;
+
+	for (const [fieldName, value] of Object.entries(fields)) {
+		// validate the value according to the field name
+	}
+
+	return disabled;
+};
+
+// if the in-line array destructuring confuses you remember it is the same as
+for (const entry of Object.entries(fields)) {
+	// array destructuring or "unpacking"
+	const [fieldName, value] = entry;
+
+	// or more imperatively
+	const fieldName = entry[0];
+	const value = entry[1];
+}
+```
+
+Within the loop we have several options for performing validations according to the input `name`. Since we only have two validation options (character limits and non-empty string) we can write this logic in the loop. Preferably this should be moved to its own function for a more declarative style. Especially if we had more fields or validation options.
+
+```js
+const shouldDisable = fields => {
+	// disabled flag, notice we use "let"
+	// this is to allow the variable to be re-assigned in the loop
+	let disabled = false;
+
+	for (const [fieldName, value] of Object.entries(fields)) {
+		if (fieldName === "name") {
+			// name field less than 3 or greater than 15 characters should disable
+			if (value.length < 3 || value.length > 15) {
+				disabled = true;
+			}
+			// other fields that are empty strings should disable
+		} else if (value === "") {
+			disabled = true;
+		}
+	}
+
+	return disabled;
+};
+```
+
+This looks pretty hairy. Let's see how it could be rewritten using a `switch` statement:
+
+```js
+const shouldDisable = fields => {
+	let disabled = false;
+
+	for (const [fieldName, value] of Object.entries(fields)) {
+		switch (fieldName) {
+			case "name":
+				if (value.length < 3 || value.length > 15) {
+					disabled = true;
+				}
+				break;
+			// these fields fall through but should be added for readability and extendability
+			case "description":
+			case "categoryID":
+			default:
+				if (value === "") {
+					disabled = true;
+				}
+		}
+	}
+
+	return disabled;
+};
+```
+
+The `switch` statement gives us greater flexibility. For now we set `description` and `categoryID` to "fall through" to the default case which checks if the value is an empty string. In the future if we wanted more specific validation for these fields we could simply add them to their respective cases. And if our form introduces new fields we can add more cases to handle them.
+
+### Implementation
+Now that the `shouldDisable` utility function has been implemented you need to consider how it will be used. We know it needs to be called every time an input changes so it should go in the `handleInputChange` method. Remember that `shouldDisable` will return the value that the state `disabled` field should be updated to. Keep that in mind as you work on the starter code for this section:
 
 - copy the starter code to its file
 - complete the TODOs in the snippet
@@ -592,24 +715,7 @@ import { categoryPropType } from '../../utilities/prop-types';
 import CheeseCategorySelector from "./CheeseCategorySelector";
 
 const shouldDisable(formFields) {
-  let disabled = false;
-  for (const [name, value] of Object.entries(formFields)) {
-    switch (name) {
-      case 'name':
-        if (value.length < 3 || value.length > 15) {
-          disabled = true;
-        }
-        break;
-      case 'description':
-      case 'categoryID':
-      default:
-        if (value === "") {
-          disabled = true;
-        }
-    }
-  }
-
-  return disabled;
+  // TODO: implement
 }
 
 // we write the initial state object externally
@@ -626,7 +732,13 @@ class CheeseForm extends Component {
   resetForm = () => this.setState(initialState);
 
   handleInputChange = event => {
-    // TODO: implement a dynamic input change event handler
+    const { name, value } = event.target;
+
+    this.setState(currentState => {
+      // TODO: implement the rest of the dynamic input change handler
+
+      return { fields, disabled };
+    });
   }
 
   handleSubmit = async (event) => {
@@ -635,11 +747,11 @@ class CheeseForm extends Component {
     const { addCheese } = this.props;
 
     // TODO: submit the form with a request to the API
-    const res = // use the correct Axios method, endpoint, and data
+    const res = // use the correct request method, endpoint, and data
     const cheese = res.data;
 
     // TODO: give the new cheese data to the Cheeses View Parent
-    // TODO: reset the form
+    this.resetForm();
   }
 
   render() {
@@ -663,6 +775,7 @@ class CheeseForm extends Component {
             <Form.Label>Cheese Category</Form.Label>
             <CheeseCategorySelector
               categories={categories}
+              categoryID={categoryID}
               handleChange={this.handleInputChange}
             />
           </Form.Group>
@@ -681,58 +794,23 @@ class CheeseForm extends Component {
         </Form.Row>
 
         <Form.Row>
-          <Col xs={{ span: 4, offset: 2 }} lg={{ span: 2, offset: 4 }}>
-            <Button
-              type='submit'
-              variant='primary'
-              disabled={disabled}
-              onClick={this.handleSubmit}
-            >
-              Create
-            </Button>
-          </Col>
-          <Col xs={{ span: 3 }} lg={{ span: 2 }}>
-            <Button
-              type='button'
-              variant='outline-secondary'
-              onClick={() => this.resetForm()}
-            >
-              Cancel
-            </Button>
-          </Col>
+          <Button
+            type='submit'
+            variant='primary'
+            disabled={disabled}
+            onClick={this.handleSubmit}
+          >
+            Create Cheese
+          </Button>
         </Form.Row>
       </Form>
     );
   }
 }
 
-
-const CheeseFormModal = (props) => {
-  const { categories, showForm, hideForm, addToCheeses } = props;
-
-  return (
-    <Modal centered size='lg' show={showForm} onHide={hideForm}>
-      <Modal.Header closeButton />
-      <Modal.Title className='text-center'>Create a New Cheese</Modal.Title>
-      <Modal.Body>
-        <CheeseForm categories={categories} addToCheeses={addToCheeses} hideForm={hideForm} />
-      </Modal.Body>
-    </Modal>
-  );
-}
-
-const CheeseFormPropTypes = {
-  categories: PropTypes.arrayOf(categoryPropType).isRequired,
-  hideForm: PropTypes.func.isRequired,
-  addToCheeses: PropTypes.func.isRequired,
+CheeseForm.propTypes = {
+  // TODO: implement the prop types
 };
 
-CheeseForm.propTypes = CheeseFormPropTypes;
-
-CheeseFormModal.propTypes = {
-  ...CheeseFormPropTypes,
-  showForm: PropTypes.bool.isRequired,
-}
-
-export default CheeseFormModal;
+export default CheeseForm;
 ```
