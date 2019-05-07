@@ -53,7 +53,6 @@ const CheesesList = props => {
 CheesesList.propTypes = {
     cheeses: PropTypes.arrayOf(cheeseType).isRequired,
     removeCheese: PropTypes.oneOfType([PropTypes.func, PropTypes.bool])
-        .isRequired
 };
 
 export default CheesesList;
