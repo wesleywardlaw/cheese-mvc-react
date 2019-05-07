@@ -1,10 +1,10 @@
 {
-  "name": "cheese-mvc-react",
-  "author": {
-    "name": "Vampiire",
-    "url": "https://github.com/the-vampiire"
-  },
-  "license": "UNLICENSED",
+	"name": "cheese-mvc-react",
+	"author": {
+		"name": "Vampiire",
+		"url": "https://github.com/the-vampiire"
+	},
+	"license": "UNLICENSED",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/the-vampiire/cheese-mvc-react"
