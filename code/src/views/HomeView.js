@@ -1,28 +1,51 @@
 import React, { Component } from 'react';
+import '../HomeView.css';
+
+const listStyle = {
+    color: 'white',
+    fontSize: '1.5em'
+};
 
 class HomeView extends Component {
     render() {
         return (
-            <div style={{ textAlign: 'center' }}>
-                <h1>Cheese MVC</h1>
-                <h2>Cheese MVC allows for the creation of cheese menus</h2>
+            <div
+                style={{
+                    textAlign: 'center',
+                    background: 'url(/images/cheese.jpg)',
+                    height: '100vh',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'cover'
+                }}
+            >
+                <h1 style={{ color: 'white' }}>Cheese MVC</h1>
+                <h2 style={{ color: 'white' }}>
+                    Cheese MVC allows for the creation of cheese menus
+                </h2>
                 <ol
                     style={{
-                        width: '10%',
+                        width: '15%',
                         margin: '0 auto',
-                        padding: '0'
+                        padding: '0',
+                        textShadow:
+                            '0px 4px 3px rgba(0,0,0,0.4)' +
+                            ',' +
+                            '0px 8px 13px rgba(0,0,0,0.1)' +
+                            ',' +
+                            '0px 18px 23px rgba(0,0,0,0.1)'
                     }}
                 >
                     <a href="/categories">
-                        <li>Add Categories</li>
+                        <li style={listStyle}>Add Categories</li>
                     </a>
                     <a href="/cheeses">
-                        <li>Create Cheeses</li>
+                        <li style={listStyle}>Create Cheeses</li>
                     </a>
                     <a href="/menus">
-                        <li>Create Menus</li>
+                        <li style={listStyle}>Create Menus</li>
                     </a>
                 </ol>
+                {/* <img alt="cheese" src="/images/cheese.jpg" /> */}
             </div>
         );
     }
