@@ -115,7 +115,6 @@ class CheesesView extends Component {
                     // only show [remove] button if in 'All' category (selectedCategoryID is an empty string)
                     removeCheese={
                         selectedCategoryID === '' && this.checkOnMenuAndRemove
-                        // selectedCategoryID === '' && this.deleteCheese
                     }
                 />
             </Container>
