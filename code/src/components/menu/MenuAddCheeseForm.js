@@ -49,12 +49,13 @@ class MenuAddCheeseForm extends Component {
         const { cheeseID } = this.state;
         const { menuID, addToCheeses } = this.props;
 
-        const res = await request.post(`/menus/${menuID}/cheeses`, {
+        await request.post(`/menus/${menuID}/cheeses`, {
             cheeseID
         });
-        const cheese = res.data;
 
-        addToCheeses(cheese);
+        const cheeseRes = await request.get(`/cheeses/${cheeseID}`);
+
+        addToCheeses(cheeseRes.data);
         this.resetForm();
     };
 

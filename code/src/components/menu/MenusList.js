@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
+import { Link } from 'react-router-dom';
 
 import { menuType } from '../../utilities/prop-types';
 
@@ -12,13 +13,11 @@ const menuRow = (menu, viewMenuCheeses) => (
     <tr key={menu.id}>
         <td>{menu.name}</td>
         <td style={{ width: '120px' }}>
-            <Button
-                variant="outline-primary"
-                size="sm"
-                onClick={() => viewMenuCheeses(menu)}
-            >
-                View Menu
-            </Button>
+            <Link to={`/menus/${menu.id}`}>
+                <Button variant="outline-primary" size="sm">
+                    View Menu
+                </Button>
+            </Link>
         </td>
     </tr>
 );
@@ -53,7 +52,6 @@ const MenusList = props => {
 };
 
 MenusList.propTypes = {
-    viewMenuCheeses: PropTypes.func.isRequired,
     menus: PropTypes.arrayOf(menuType).isRequired
 };
 
