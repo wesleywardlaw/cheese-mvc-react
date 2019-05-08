@@ -31,21 +31,38 @@ class CheesesView extends Component {
             return { cheeses: [cheese, ...cheeses] };
         });
 
-    deleteCheese = async cheeseID => {
-        const res = await request.delete(`/cheeses/${cheeseID}`);
+    checkOnMenuAndRemove = async cheeseID => {
+        const menusRes = await request.get('/menus');
+        const menus = menusRes.data;
 
-        // if the DELETE request was unsuccessful exit early
-        if (res.status !== 200) {
-            return;
-        }
+        const deletePromises = menus.map(menu => {
+            const hasCheese = menu.cheeses.some(
+                cheese => cheese.id === cheeseID
+            );
+            return (
+                hasCheese &&
+                request.delete(`/menus/${menu.id}/cheeses/${cheeseID}`)
+            );
+        });
 
-        // otherwise update state by removing the cheese
+        await Promise.all(deletePromises);
+        await this.deleteCheese(cheeseID);
+    };
+
+    removeFromCheeses = cheeseID =>
         this.setState(state => {
             const cheeses = state.cheeses.filter(
                 cheese => cheese.id !== cheeseID
             );
             return { cheeses };
         });
+
+    deleteCheese = async cheeseID => {
+        const res = await request.delete(`/cheeses/${cheeseID}`);
+
+        if (res && res.status === 200) {
+            this.removeFromCheeses(cheeseID);
+        }
     };
 
     getCategoryCheeses = async categoryChangeEvent => {
@@ -97,7 +114,8 @@ class CheesesView extends Component {
                     cheeses={cheeses}
                     // only show [remove] button if in 'All' category (selectedCategoryID is an empty string)
                     removeCheese={
-                        selectedCategoryID === '' && this.deleteCheese
+                        selectedCategoryID === '' && this.checkOnMenuAndRemove
+                        // selectedCategoryID === '' && this.deleteCheese
                     }
                 />
             </Container>
