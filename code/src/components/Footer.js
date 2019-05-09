@@ -6,14 +6,16 @@ const Footer = () => (
     <footer className="fixed-bottom">
         <Row className="text-center">
             <Col xs={12}>
-                Coded by&nbsp;
-                <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://github.com/wesleywardlaw"
-                >
-                    Wesley Wardlaw
-                </a>
+                <div style={{ marginBottom: '2.5vh' }}>
+                    Coded by&nbsp;
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://github.com/wesleywardlaw"
+                    >
+                        Wesley Wardlaw
+                    </a>
+                </div>
             </Col>
         </Row>
     </footer>

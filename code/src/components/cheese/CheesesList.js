@@ -31,7 +31,13 @@ const CheesesList = props => {
     return (
         <Container>
             <h3 className="text-center">Cheeses</h3>
-            <Table responsive striped bordered size="lg">
+            <Table
+                responsive
+                striped
+                bordered
+                size="lg"
+                style={{ marginBottom: '50px' }}
+            >
                 <thead>
                     <tr>
                         {removeCheese && <th style={{ border: 'none' }} />}

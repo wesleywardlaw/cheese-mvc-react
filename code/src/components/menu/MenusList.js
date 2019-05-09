@@ -34,7 +34,12 @@ const MenusList = props => {
             </Row>
             <Row>
                 <Col xs={12} lg={{ span: 4, offset: 4 }}>
-                    <Table responsive bordered size="lg">
+                    <Table
+                        responsive
+                        bordered
+                        size="lg"
+                        style={{ marginBottom: '50px' }}
+                    >
                         <thead>
                             <tr>
                                 <th>Name</th>
